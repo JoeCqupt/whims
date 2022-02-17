@@ -2,14 +2,16 @@ package io.github.joecqupt.protocol.simple;
 
 import io.github.joecqupt.protocol.DataPackage;
 
+import static io.github.joecqupt.protocol.Protocol.MASK_SIZE;
+
 /**
  * the simple protocol data package desc:
  * <p>
- * |-9527-|-packageSize-|-headerSize-|---header-data---|-bodySize-|---body-data--|
+ * |-9527(int)-|-packageSize(int)-|-headerSize(int)-|---header-data(byte[])---|-bodySize(int)-|---body-data(byte[])--|
  */
 public class SimpleDataPackage implements DataPackage {
 
-    private int mask = 9527;
+    public final static int mask = 9527;
 
     private int packageSize;
 
@@ -18,4 +20,50 @@ public class SimpleDataPackage implements DataPackage {
 
     private int bodySize;
     private byte[] body;
+
+
+    @Override
+    public int totalSize() {
+        return MASK_SIZE + packageSize;
+    }
+
+    public int getPackageSize() {
+        return packageSize;
+    }
+
+    public void setPackageSize(int packageSize) {
+        this.packageSize = packageSize;
+    }
+
+    public int getHeaderSize() {
+        return headerSize;
+    }
+
+    public void setHeaderSize(int headerSize) {
+        this.headerSize = headerSize;
+    }
+
+    public byte[] getHeader() {
+        return header;
+    }
+
+    public void setHeader(byte[] header) {
+        this.header = header;
+    }
+
+    public int getBodySize() {
+        return bodySize;
+    }
+
+    public void setBodySize(int bodySize) {
+        this.bodySize = bodySize;
+    }
+
+    public byte[] getBody() {
+        return body;
+    }
+
+    public void setBody(byte[] body) {
+        this.body = body;
+    }
 }

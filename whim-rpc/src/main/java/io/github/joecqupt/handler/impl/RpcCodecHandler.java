@@ -1,15 +1,58 @@
 package io.github.joecqupt.handler.impl;
 
 import io.github.joecqupt.channel.pipeline.ChannelContext;
-import io.github.joecqupt.handler.ChannelInboundHandler;
+import io.github.joecqupt.exception.NotEnoughException;
+import io.github.joecqupt.handler.ChannelAdapterHandler;
+import io.github.joecqupt.protocol.DataPackage;
+import io.github.joecqupt.protocol.ProtocolRouter;
+import io.github.joecqupt.protocol.ProtocolType;
 
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 
-public class RpcCodecHandler implements ChannelInboundHandler {
+public class RpcCodecHandler implements ChannelAdapterHandler {
+
+
+    private ByteBuffer bufferCollector = null;
+
+    private ProtocolRouter protocolRouter = new ProtocolRouter();
 
     @Override
     public void channelRead(ChannelContext context, Object buf) {
         // 根据自定义协议格式，解析数据包
         ByteBuffer buffer = (ByteBuffer) buf;
+        try {
+            // 这一段突出的就是性能不高.....
+            if (bufferCollector == null) {
+                bufferCollector = ByteBuffer.allocate(buffer.remaining());
+            } else {
+                int newSize = bufferCollector.remaining() + buffer.remaining();
+                ByteBuffer oldBufferCollector = bufferCollector;
+                bufferCollector = ByteBuffer.allocate(newSize);
+                bufferCollector.put(oldBufferCollector.array(), oldBufferCollector.position(), oldBufferCollector.limit());
+            }
+            bufferCollector.put(buffer.array(), buffer.position(), buffer.limit());
+            DataPackage dataPackage = protocolRouter.readData(bufferCollector);
+            bufferCollector.compact();
+            // 让后续处理这个数据包
+            context.fireChannelRead(dataPackage);
+        } catch (NotEnoughException nee) {
+            // ignore
+        }
+    }
+
+    @Override
+    public void connect(SocketAddress address) {
+
+    }
+
+    @Override
+    public void bind(SocketAddress address) {
+
+    }
+
+    @Override
+    public void write(Object msg) {
+
     }
 }

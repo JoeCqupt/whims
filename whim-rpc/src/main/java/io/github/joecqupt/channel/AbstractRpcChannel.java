@@ -1,9 +1,9 @@
 package io.github.joecqupt.channel;
 
-import io.github.joecqupt.channel.pipeline.DefaultChannelPipeline;
+import io.github.joecqupt.channel.pipeline.ChannelPipeline;
 
 public abstract class AbstractRpcChannel implements RpcChannel {
 
-    protected DefaultChannelPipeline pipeline;
+    protected ChannelPipeline pipeline;
 
 }

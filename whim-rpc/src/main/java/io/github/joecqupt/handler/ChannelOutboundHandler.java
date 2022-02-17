@@ -3,7 +3,7 @@ package io.github.joecqupt.handler;
 
 import java.net.SocketAddress;
 
-public interface ChannelOutboundHandler {
+public interface ChannelOutboundHandler extends ChannelHandler {
 
     void connect(SocketAddress address);
 

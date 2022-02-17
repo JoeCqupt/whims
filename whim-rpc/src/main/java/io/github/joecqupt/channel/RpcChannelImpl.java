@@ -1,6 +1,7 @@
 package io.github.joecqupt.channel;
 
 
+import io.github.joecqupt.channel.pipeline.ChannelPipeline;
 import io.github.joecqupt.eventloop.EventLoop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +14,8 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 
-public class RpcClientChannel extends AbstractRpcChannel implements RpcChannel {
-    private static final Logger LOG = LoggerFactory.getLogger(RpcClientChannel.class);
+public class RpcChannelImpl extends AbstractRpcChannel implements RpcChannel {
+    private static final Logger LOG = LoggerFactory.getLogger(RpcChannelImpl.class);
     private SocketChannel socketChannel;
 
     /**
@@ -22,8 +23,9 @@ public class RpcClientChannel extends AbstractRpcChannel implements RpcChannel {
      */
     private static int defaultReadBufferSize = 512;
 
-    public RpcClientChannel(SocketChannel socketChannel) {
+    public RpcChannelImpl(SocketChannel socketChannel, ChannelPipeline pipeline) {
         this.socketChannel = socketChannel;
+        this.pipeline = pipeline;
     }
 
     @Override

@@ -5,7 +5,7 @@ import io.github.joecqupt.handler.ChannelInboundHandler;
 
 import java.net.SocketAddress;
 
-public class DefaultChannelPipeline extends AbstractChannelContext implements ChannelContext {
+public class DefaultChannelPipeline extends AbstractChannelContext implements ChannelContext,ChannelPipeline {
 
     private AbstractChannelContext head = new HeadContext();
     private AbstractChannelContext tail = new TailContext();
@@ -19,7 +19,8 @@ public class DefaultChannelPipeline extends AbstractChannelContext implements Ch
      * 新增channelHandler到tail之前
      * @param handler
      */
-    public void addLastChannelHandler(ChannelHandler handler) {
+    @Override
+    public void addLast(ChannelHandler handler) {
         AbstractChannelContext newCtx = new DefaultChannelContext(handler, this);
         AbstractChannelContext prev = tail.prev;
 

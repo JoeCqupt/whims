@@ -5,7 +5,6 @@ import io.github.joecqupt.handler.ChannelHandler;
 import java.net.SocketAddress;
 
 public class DefaultChannelContext extends AbstractChannelContext  implements ChannelContext{
-    private DefaultChannelPipeline pipeline;
 
     public DefaultChannelContext(ChannelHandler channelHandler, DefaultChannelPipeline pipeline) {
         this.channelHandler = channelHandler;

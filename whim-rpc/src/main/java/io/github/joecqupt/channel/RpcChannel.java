@@ -16,5 +16,7 @@ public interface RpcChannel {
 
     void read();
 
-    void write();
+    void write(byte[] data);
+
+    void flush();
 }

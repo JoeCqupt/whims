@@ -6,4 +6,6 @@ public interface ChannelContext extends ChannelAdapterHandler {
 
     void fireChannelRead(Object msg);
 
+    ChannelPipeline pipeline();
+
 }

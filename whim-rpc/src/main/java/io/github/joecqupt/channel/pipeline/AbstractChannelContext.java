@@ -10,6 +10,12 @@ public abstract class AbstractChannelContext implements ChannelContext {
 
     protected ChannelHandler channelHandler;
 
+    protected DefaultChannelPipeline pipeline;
+
+    @Override
+    public ChannelPipeline pipeline() {
+        return pipeline;
+    }
 
     @Override
     public void fireChannelRead(Object msg) {

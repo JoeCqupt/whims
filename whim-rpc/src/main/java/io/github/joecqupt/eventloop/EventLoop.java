@@ -48,10 +48,10 @@ public class EventLoop extends Thread {
         while (iterator.hasNext()) {
             SelectionKey key = iterator.next();
             RpcChannel rpcChannel = (RpcChannel) key.attachment();
-            if (key.isAcceptable() || key.isReadable()) {
+            if (key.isReadable()) {
                 rpcChannel.read();
             } else {
-                rpcChannel.write();
+                rpcChannel.flush();
             }
             iterator.remove();
         }

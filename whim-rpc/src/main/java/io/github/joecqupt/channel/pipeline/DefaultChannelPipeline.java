@@ -1,11 +1,14 @@
 package io.github.joecqupt.channel.pipeline;
 
+import io.github.joecqupt.channel.RpcChannel;
 import io.github.joecqupt.handler.ChannelHandler;
 import io.github.joecqupt.handler.ChannelInboundHandler;
 
 import java.net.SocketAddress;
 
 public class DefaultChannelPipeline extends AbstractChannelContext implements ChannelContext,ChannelPipeline {
+    private RpcChannel channel;
+
 
     private AbstractChannelContext head = new HeadContext();
     private AbstractChannelContext tail = new TailContext();
@@ -13,6 +16,16 @@ public class DefaultChannelPipeline extends AbstractChannelContext implements Ch
     public DefaultChannelPipeline() {
         head.next = tail;
         tail.prev = head;
+    }
+
+    @Override
+    public RpcChannel getChannel() {
+        return channel;
+    }
+
+    @Override
+    public void setChannel(RpcChannel channel) {
+        this.channel = channel;
     }
 
     /**

@@ -13,10 +13,14 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RpcChannelImpl extends AbstractRpcChannel implements RpcChannel {
     private static final Logger LOG = LoggerFactory.getLogger(RpcChannelImpl.class);
     private SocketChannel socketChannel;
+
+    private List<byte[]> writeBuffer = new ArrayList<>();
 
     /**
      * 每次默认读取多大的信息
@@ -26,6 +30,7 @@ public class RpcChannelImpl extends AbstractRpcChannel implements RpcChannel {
     public RpcChannelImpl(SocketChannel socketChannel, ChannelPipeline pipeline) {
         this.socketChannel = socketChannel;
         this.pipeline = pipeline;
+        pipeline.setChannel(this);
     }
 
     @Override
@@ -56,14 +61,17 @@ public class RpcChannelImpl extends AbstractRpcChannel implements RpcChannel {
             socketChannel.read(buffer);
             pipeline.fireChannelRead(buffer);
         } catch (IOException ioe) {
-            // todo
+            // todo build response
         }
     }
 
     @Override
-    public void write() {
-
+    public void write(byte[] data) {
+        writeBuffer.add(data);
     }
 
-
+    @Override
+    public void flush() {
+        // todo
+    }
 }

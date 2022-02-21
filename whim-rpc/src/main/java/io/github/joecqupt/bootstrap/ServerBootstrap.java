@@ -36,7 +36,7 @@ public class ServerBootstrap {
         return new ServerBootstrap(serverSocketChannel);
     }
 
-    public ServerBootstrap eventLoopGroup(EventLoopGroup eventLoopGroup) {
+    public ServerBootstrap workEventLoopGroup(EventLoopGroup eventLoopGroup) {
         this.eventLoopGroup = eventLoopGroup;
         return this;
     }

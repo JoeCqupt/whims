@@ -19,7 +19,7 @@ public class EventLoopGroup {
     }
 
     public void register(RpcChannel channel) {
-        // choose a event loop
+        // choose an event loop
         EventLoop eventLoop = chooseEventLoop();
         channel.register(eventLoop);
     }

@@ -10,6 +10,11 @@ import io.github.joecqupt.serialization.SerializeType;
 import io.github.joecqupt.serialization.Serializer;
 import io.github.joecqupt.serialization.SerializerManager;
 
+import java.nio.ByteBuffer;
+
+import static io.github.joecqupt.protocol.Protocol.MASK_SIZE;
+import static io.github.joecqupt.protocol.simple.SimpleProtocol.PACKAGE_SIZE;
+
 /**
  * the simple protocol data package desc:
  * <p>
@@ -74,7 +79,22 @@ public class SimpleDataPackage implements DataPackage {
     }
 
     @Override
-    public byte[] serialize(RpcResponse rpcResponse) {
-        return new byte[0];
+    public ByteBuffer serialize(RpcResponse rpcResponse) {
+        Serializer serializer = SerializerManager.getSerializer(SerializeType.JSON);
+        byte[] header = serializer.serialize(rpcResponse.getRpcMeta());
+        int headerSize = header.length;
+        byte[] body = serializer.serialize(rpcResponse.getResponse());
+        int bodySize = body.length;
+        int packageSize = headerSize + bodySize;
+        int totalSize = MASK_SIZE + PACKAGE_SIZE + headerSize + bodySize;
+        // array copy 性能差
+        ByteBuffer data = ByteBuffer.allocate(totalSize);
+        data.putInt(MASK);
+        data.putInt(packageSize);
+        data.putInt(headerSize);
+        data.put(header);
+        data.putInt(bodySize);
+        data.put(body);
+        return data;
     }
 }

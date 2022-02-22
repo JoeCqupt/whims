@@ -3,6 +3,7 @@ package io.github.joecqupt.channel;
 import io.github.joecqupt.eventloop.EventLoop;
 
 import java.net.SocketAddress;
+import java.nio.ByteBuffer;
 
 public interface RpcChannel {
 
@@ -16,7 +17,7 @@ public interface RpcChannel {
 
     void read();
 
-    void write(byte[] data);
+    void write(ByteBuffer data);
 
     void flush();
 }

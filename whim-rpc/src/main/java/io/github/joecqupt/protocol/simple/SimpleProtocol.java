@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
  */
 public class SimpleProtocol implements Protocol {
 
-    private static int PACKAGE_SIZE = 4;
+    public static final int PACKAGE_SIZE = 4;
 
     @Override
     public DataPackage readData(ByteBuffer buffer) {

@@ -8,6 +8,7 @@ import io.github.joecqupt.serialization.RpcRequest;
 import io.github.joecqupt.serialization.RpcResponse;
 
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -42,7 +43,7 @@ public class Invoker {
                 Method method = apiMeta.getMethod();
                 Object response = method.invoke(instance, rpcRequest.getRequest());
                 DataPackage dataPackage = DataPackageFactory.newInstance(rpcMeta.getProtocolType());
-                byte[] data = dataPackage.serialize(new RpcResponse(response));
+                ByteBuffer data = dataPackage.serialize(new RpcResponse(new RpcMeta(rpcMeta.getInvokeId()), response));
                 channel.write(data);
             } catch (Exception e) {
                 // todo

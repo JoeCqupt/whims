@@ -20,7 +20,7 @@ public class RpcChannelImpl extends AbstractRpcChannel implements RpcChannel {
     private static final Logger LOG = LoggerFactory.getLogger(RpcChannelImpl.class);
     private SocketChannel socketChannel;
 
-    private List<byte[]> writeBuffer = new ArrayList<>();
+    private List<ByteBuffer> writeBuffer = new ArrayList<>();
 
     /**
      * 每次默认读取多大的信息
@@ -66,12 +66,18 @@ public class RpcChannelImpl extends AbstractRpcChannel implements RpcChannel {
     }
 
     @Override
-    public void write(byte[] data) {
+    public void write(ByteBuffer data) {
         writeBuffer.add(data);
     }
 
     @Override
     public void flush() {
-        // todo
+        for (ByteBuffer buffer : writeBuffer) {
+            try {
+                socketChannel.write(buffer);
+            } catch (IOException e) {
+                //  todo build response
+            }
+        }
     }
 }

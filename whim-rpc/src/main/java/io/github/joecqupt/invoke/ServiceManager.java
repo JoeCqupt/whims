@@ -1,6 +1,10 @@
 package io.github.joecqupt.invoke;
 
 import io.github.joecqupt.annotation.RpcMethod;
+import io.github.joecqupt.register.RegisterConfig;
+import io.github.joecqupt.register.RegisterManager;
+import io.github.joecqupt.register.RegisterType;
+import io.github.joecqupt.register.ServiceRegister;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -16,7 +20,7 @@ public class ServiceManager {
      */
     private static final Map<String, ApiMeta> API = new ConcurrentHashMap<>();
 
-    public static synchronized void registerService(Object service) {
+    public static synchronized void registerService(Object service, RegisterConfig registerConfig) {
         Class<?> clazz = service.getClass();
         Method[] methods = clazz.getMethods();
         for (Method m : methods) {
@@ -30,6 +34,9 @@ public class ServiceManager {
                     throw new RuntimeException("api has over one parameter: " + apiKey);
                 }
                 API.put(apiKey, new ApiMeta(service, m));
+                ServiceRegister register = RegisterManager.getRegister(registerConfig);
+                // TODO 这里没有endpoint信息
+                register.register(apiKey);
             }
         }
     }

@@ -2,18 +2,18 @@ package io.github.joecqupt.register;
 
 import java.util.Objects;
 
-public class RegisterConfig {
-    private RegisterType registerType;
+public class RegistryConfig {
+    private RegistryType registryType;
     private String registerUrl;
     private String userName;
     private String password;
 
-    public RegisterType getRegisterType() {
-        return registerType;
+    public RegistryType getRegisterType() {
+        return registryType;
     }
 
-    public void setRegisterType(RegisterType registerType) {
-        this.registerType = registerType;
+    public void setRegisterType(RegistryType registryType) {
+        this.registryType = registryType;
     }
 
     public String getRegisterUrl() {
@@ -44,19 +44,19 @@ public class RegisterConfig {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RegisterConfig that = (RegisterConfig) o;
-        return registerType == that.registerType && Objects.equals(registerUrl, that.registerUrl) && Objects.equals(userName, that.userName) && Objects.equals(password, that.password);
+        RegistryConfig that = (RegistryConfig) o;
+        return registryType == that.registryType && Objects.equals(registerUrl, that.registerUrl) && Objects.equals(userName, that.userName) && Objects.equals(password, that.password);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(registerType, registerUrl, userName, password);
+        return Objects.hash(registryType, registerUrl, userName, password);
     }
 
     @Override
     public String toString() {
         return "RegisterConfig{" +
-                "registerType=" + registerType +
+                "registerType=" + registryType +
                 ", registerUrl='" + registerUrl + '\'' +
                 ", userName='" + userName + '\'' +
                 ", password='" + password + '\'' +

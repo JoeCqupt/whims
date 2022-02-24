@@ -1,5 +1,5 @@
 package io.github.joecqupt.register;
 
-public enum RegisterType {
+public enum RegistryType {
     END_POINTS;
 }

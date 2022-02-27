@@ -2,20 +2,21 @@ package io.github.joecqupt.register;
 
 import io.github.joecqupt.common.NetUtils;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 public class ProviderInfo {
-    private List<String> apiKeys;
+    private List<Method> rpcMethods;
     private int port;
     private String ip = NetUtils.getLocalIp();
     private List<String> labels;
 
-    public List<String> getApiKeys() {
-        return apiKeys;
+    public List<Method> getRpcMethods() {
+        return rpcMethods;
     }
 
-    public void setApiKeys(List<String> apiKeys) {
-        this.apiKeys = apiKeys;
+    public void setRpcMethods(List<Method> rpcMethods) {
+        this.rpcMethods = rpcMethods;
     }
 
     public int getPort() {

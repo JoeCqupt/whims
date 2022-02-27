@@ -1,26 +1,19 @@
 package io.github.joecqupt.register;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 public class ConsumerInfo {
-    private String serviceName;
-    private String methodNAme;
+    private List<Method> rpcMethods;
+
     private List<String> labels;
 
-    public String getServiceName() {
-        return serviceName;
+    public List<Method> getRpcMethods() {
+        return rpcMethods;
     }
 
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
-    }
-
-    public String getMethodNAme() {
-        return methodNAme;
-    }
-
-    public void setMethodNAme(String methodNAme) {
-        this.methodNAme = methodNAme;
+    public void setRpcMethods(List<Method> rpcMethods) {
+        this.rpcMethods = rpcMethods;
     }
 
     public List<String> getLabels() {

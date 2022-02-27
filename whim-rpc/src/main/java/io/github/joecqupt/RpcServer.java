@@ -9,6 +9,7 @@ import io.github.joecqupt.register.RegistryConfig;
 import io.github.joecqupt.register.RegistryManager;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.util.List;
 
@@ -28,10 +29,10 @@ public class RpcServer {
      * export a service interface
      */
     public void export(Object service) {
-        List<String> apiKeys = ServiceManager.registerService(service);
+        List<Method> rpcMethods = ServiceManager.registerService(service);
         Registry register = RegistryManager.getRegister(registryConfig);
         ProviderInfo providerInfo = new ProviderInfo();
-        providerInfo.setApiKeys(apiKeys);
+        providerInfo.setRpcMethods(rpcMethods);
         providerInfo.setPort(port);
         register.register(providerInfo);
     }

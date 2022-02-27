@@ -9,13 +9,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ConsumerInfoManager {
 
-    private Map<ConsumerInfo, List<ServiceInstance>> providerCache = new ConcurrentHashMap<>();
+    private Map<String, List<ServiceInstance>> providerCache = new ConcurrentHashMap<>();
 
-    public synchronized List<ServiceInstance> getServiceInstanceList(ConsumerInfo consumerInfo) {
-        return providerCache.get(consumerInfo);
+    public synchronized List<ServiceInstance> getServiceInstanceList(String apiKey) {
+        return providerCache.get(apiKey);
     }
 
-    public synchronized void updateConsumerInfo(ConsumerInfo consumerInfo, List<ServiceInstance> serviceInstanceList) {
-        providerCache.put(consumerInfo, serviceInstanceList);
+    public synchronized void updateConsumerInfo(String apiKey, List<ServiceInstance> serviceInstanceList) {
+        providerCache.put(apiKey, serviceInstanceList);
     }
 }

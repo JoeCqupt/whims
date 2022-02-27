@@ -1,9 +1,7 @@
 package io.github.joecqupt.invoke;
 
 import io.github.joecqupt.annotation.RpcMethod;
-import io.github.joecqupt.register.RegistryConfig;
-import io.github.joecqupt.register.RegistryManager;
-import io.github.joecqupt.register.Registry;
+import io.github.joecqupt.common.Utils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -21,14 +19,14 @@ public class ServiceManager {
      */
     private static final Map<String, ApiMeta> API = new ConcurrentHashMap<>();
 
-    public static synchronized List<String> registerService(Object service) {
-        List<String> apiKeys = new ArrayList<>();
+    public static synchronized List<Method> registerService(Object service) {
+        List<Method> rpcMethods = new ArrayList<>();
         Class<?> clazz = service.getClass();
         Method[] methods = clazz.getMethods();
         for (Method m : methods) {
             boolean isRpcMethod = m.isAnnotationPresent(RpcMethod.class);
             if (isRpcMethod) {
-                String apiKey = apiKey(clazz.getName(), m.getName());
+                String apiKey = Utils.apiKey(clazz.getName(), m.getName());
                 if (API.containsKey(apiKey)) {
                     throw new RuntimeException("api duplicate register: " + apiKey);
                 }
@@ -36,19 +34,17 @@ public class ServiceManager {
                     throw new RuntimeException("api has over one parameter: " + apiKey);
                 }
                 API.put(apiKey, new ApiMeta(service, m));
-                apiKeys.add(apiKey);
+                rpcMethods.add(m);
             }
         }
-        return apiKeys;
+        return rpcMethods;
     }
 
     public static ApiMeta getApiMeta(String apiKey) {
         return API.get(apiKey);
     }
 
-    private static String apiKey(String className, String methodName) {
-        return className + HASH_SIGN + methodName;
-    }
+
 
     public static class ApiMeta {
         private Object instance;

@@ -26,7 +26,7 @@ public class TailContext extends AbstractChannelContext implements ChannelContex
     }
 
     @Override
-    public void write(Object msg) {
-
+    public void write(ChannelContext context, Object msg) {
+        context.write(msg);
     }
 }

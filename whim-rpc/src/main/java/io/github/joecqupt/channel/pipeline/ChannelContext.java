@@ -8,4 +8,5 @@ public interface ChannelContext extends ChannelAdapterHandler {
 
     ChannelPipeline pipeline();
 
+    void write(Object msg);
 }

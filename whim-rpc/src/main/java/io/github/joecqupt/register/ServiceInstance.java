@@ -1,5 +1,7 @@
 package io.github.joecqupt.register;
 
+import java.util.Objects;
+
 public class ServiceInstance {
     private String ip;
     private int port;
@@ -18,5 +20,26 @@ public class ServiceInstance {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ServiceInstance instance = (ServiceInstance) o;
+        return port == instance.port && Objects.equals(ip, instance.ip);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ip, port);
+    }
+
+    @Override
+    public String toString() {
+        return "ServiceInstance{" +
+                "ip='" + ip + '\'' +
+                ", port=" + port +
+                '}';
     }
 }

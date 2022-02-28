@@ -1,6 +1,8 @@
 package io.github.joecqupt.handler;
 
 
+import io.github.joecqupt.channel.pipeline.ChannelContext;
+
 import java.net.SocketAddress;
 
 public interface ChannelOutboundHandler extends ChannelHandler {
@@ -9,5 +11,5 @@ public interface ChannelOutboundHandler extends ChannelHandler {
 
     void bind(SocketAddress address);
 
-    void write(Object msg);
+    void write(ChannelContext context, Object msg);
 }

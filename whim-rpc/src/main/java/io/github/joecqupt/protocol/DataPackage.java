@@ -9,5 +9,8 @@ public interface DataPackage {
 
     RpcRequest deserialize();
 
-    ByteBuffer serialize(RpcResponse rpcResponse);
+    DataPackage serialize(RpcResponse rpcResponse);
+
+    ByteBuffer toByteBuffer();
+
 }

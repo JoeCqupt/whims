@@ -42,9 +42,8 @@ public class Invoker {
                 Object instance = apiMeta.getInstance();
                 Method method = apiMeta.getMethod();
                 Object response = method.invoke(instance, rpcRequest.getRequest());
-                DataPackage dataPackage = DataPackageFactory.newInstance(rpcMeta.getProtocolType());
-                ByteBuffer data = dataPackage.serialize(new RpcResponse(new RpcMeta(rpcMeta.getInvokeId()), response));
-                channel.write(data);
+                RpcResponse rpcResponse = new RpcResponse(rpcMeta, response);
+                channel.pipeline().write(rpcResponse);
             } catch (Exception e) {
                 // todo
                 // build response

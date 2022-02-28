@@ -3,11 +3,11 @@ package io.github.joecqupt.register.endpoints;
 import io.github.joecqupt.register.*;
 
 public class EndPointsRegistry implements Registry {
-    private ConsumerInfoManager consumerInfoManager;
+    private ServiceInstanceStore serviceInstanceStore;
 
     @Override
     public void init(RegistryConfig config) {
-        consumerInfoManager = new ConsumerInfoManager();
+        serviceInstanceStore = new ServiceInstanceStore();
     }
 
     @Override
@@ -31,7 +31,7 @@ public class EndPointsRegistry implements Registry {
     }
 
     @Override
-    public ConsumerInfoManager getConsumerInfoManager() {
-        return this.consumerInfoManager;
+    public ServiceInstanceStore getInstanceStore() {
+        return this.serviceInstanceStore;
     }
 }

@@ -27,7 +27,9 @@ public class DefaultChannelContext extends AbstractChannelContext  implements Ch
     }
 
     @Override
-    public void write(Object msg) {
+    public void write(ChannelContext context, Object msg) {
 
     }
+
+
 }

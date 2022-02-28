@@ -1,7 +1,7 @@
 package io.github.joecqupt.bootstrap;
 
 import io.github.joecqupt.channel.RpcChannel;
-import io.github.joecqupt.channel.RpcChannelImpl;
+import io.github.joecqupt.channel.RpcServerChannel;
 import io.github.joecqupt.channel.pipeline.ChannelPipeline;
 import io.github.joecqupt.channel.pipeline.DefaultChannelPipeline;
 import io.github.joecqupt.eventloop.EventLoopGroup;
@@ -77,7 +77,7 @@ public class ServerBootstrap {
                             ChannelPipeline pipeline = new DefaultChannelPipeline();
                             pipeline.addLast(new RpcCodecHandler());
                             pipeline.addLast(new RpcServerHandler());
-                            RpcChannel rpcChannel = new RpcChannelImpl(socketChannel, pipeline);
+                            RpcChannel rpcChannel = new RpcServerChannel(socketChannel, pipeline);
                             eventLoopGroup.register(rpcChannel);
                         }
                     }

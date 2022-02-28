@@ -12,4 +12,6 @@ public interface ChannelPipeline {
     void setChannel(RpcChannel channel);
 
     RpcChannel getChannel();
+
+    void write(Object data);
 }

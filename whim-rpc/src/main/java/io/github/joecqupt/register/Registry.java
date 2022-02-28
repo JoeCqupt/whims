@@ -12,5 +12,5 @@ public interface Registry {
 
     void unSubscribe(ConsumerInfo supplierInfo);
 
-    ConsumerInfoManager getConsumerInfoManager();
+    ServiceInstanceStore getInstanceStore();
 }

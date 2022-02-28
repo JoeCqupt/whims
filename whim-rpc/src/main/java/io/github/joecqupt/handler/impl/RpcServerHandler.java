@@ -4,9 +4,13 @@ import io.github.joecqupt.channel.pipeline.ChannelContext;
 import io.github.joecqupt.handler.ChannelAdapterHandler;
 import io.github.joecqupt.invoke.Invoker;
 import io.github.joecqupt.protocol.DataPackage;
+import io.github.joecqupt.protocol.DataPackageFactory;
+import io.github.joecqupt.serialization.RpcMeta;
 import io.github.joecqupt.serialization.RpcRequest;
+import io.github.joecqupt.serialization.RpcResponse;
 
 import java.net.SocketAddress;
+import java.nio.ByteBuffer;
 
 public class RpcServerHandler implements ChannelAdapterHandler {
     @Override
@@ -27,7 +31,13 @@ public class RpcServerHandler implements ChannelAdapterHandler {
     }
 
     @Override
-    public void write(Object msg) {
-
+    public void write(ChannelContext context, Object msg) {
+        RpcResponse rpcResponse = (RpcResponse) msg;
+        RpcMeta rpcMeta = rpcResponse.getRpcMeta();
+        DataPackage dataPackage = DataPackageFactory.newInstance(rpcMeta.getProtocolType());
+        dataPackage.serialize(rpcResponse);
+        context.write(dataPackage);
     }
+
+
 }

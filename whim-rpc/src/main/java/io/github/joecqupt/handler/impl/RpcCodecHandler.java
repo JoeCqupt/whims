@@ -9,6 +9,8 @@ import io.github.joecqupt.protocol.ProtocolRouter;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 
+import static io.github.joecqupt.protocol.Protocol.MASK_SIZE;
+
 public class RpcCodecHandler implements ChannelAdapterHandler {
 
 
@@ -55,7 +57,9 @@ public class RpcCodecHandler implements ChannelAdapterHandler {
     }
 
     @Override
-    public void write(Object msg) {
-
+    public void write(ChannelContext context, Object msg) {
+        DataPackage dataPackage = (DataPackage) msg;
+        ByteBuffer byteBuffer = dataPackage.toByteBuffer();
+        context.write(byteBuffer);
     }
 }

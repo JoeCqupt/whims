@@ -6,4 +6,8 @@ public abstract class AbstractRpcChannel implements RpcChannel {
 
     protected ChannelPipeline pipeline;
 
+    @Override
+    public ChannelPipeline pipeline() {
+        return pipeline;
+    }
 }

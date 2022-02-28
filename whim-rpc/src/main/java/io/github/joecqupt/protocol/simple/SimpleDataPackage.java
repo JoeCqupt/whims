@@ -78,14 +78,25 @@ public class SimpleDataPackage implements DataPackage {
         return rpcRequest;
     }
 
+
     @Override
-    public ByteBuffer serialize(RpcResponse rpcResponse) {
+    public DataPackage serialize(RpcResponse rpcResponse) {
         Serializer serializer = SerializerManager.getSerializer(SerializeType.JSON);
         byte[] header = serializer.serialize(rpcResponse.getRpcMeta());
         int headerSize = header.length;
         byte[] body = serializer.serialize(rpcResponse.getResponse());
         int bodySize = body.length;
         int packageSize = headerSize + bodySize;
+        this.packageSize = packageSize;
+        this.headerSize = headerSize;
+        this.header = header;
+        this.bodySize = bodySize;
+        this.body = body;
+        return this;
+    }
+
+    @Override
+    public ByteBuffer toByteBuffer() {
         int totalSize = MASK_SIZE + PACKAGE_SIZE + headerSize + bodySize;
         // array copy 性能差
         ByteBuffer data = ByteBuffer.allocate(totalSize);

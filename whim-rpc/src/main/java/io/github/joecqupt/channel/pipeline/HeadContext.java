@@ -25,6 +25,6 @@ public class HeadContext extends AbstractChannelContext implements ChannelContex
     @Override
     public void write(ChannelContext context, Object msg) {
         RpcChannel channel = context.pipeline().getChannel();
-        channel.write((ByteBuffer) msg);
+        channel.write(msg);
     }
 }

@@ -3,6 +3,7 @@ package io.github.joecqupt.protocol.simple;
 import io.github.joecqupt.exception.NotEnoughException;
 import io.github.joecqupt.protocol.DataPackage;
 import io.github.joecqupt.protocol.Protocol;
+import io.github.joecqupt.serialization.RpcRequest;
 
 import java.nio.ByteBuffer;
 
@@ -48,5 +49,11 @@ public class SimpleProtocol implements Protocol {
         } else {
             throw new NotEnoughException();
         }
+    }
+
+    @Override
+    public DataPackage writeData(RpcRequest rpcRequest) {
+        // todo
+        return null;
     }
 }

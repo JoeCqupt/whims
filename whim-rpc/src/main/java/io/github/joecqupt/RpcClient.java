@@ -4,6 +4,7 @@ import io.github.joecqupt.annotation.RpcMethod;
 import io.github.joecqupt.common.ReflectionUtils;
 import io.github.joecqupt.eventloop.EventLoopGroup;
 import io.github.joecqupt.invoke.RpcClientProxy;
+import io.github.joecqupt.protocol.ProtocolType;
 import io.github.joecqupt.register.ConsumerInfo;
 import io.github.joecqupt.register.Registry;
 import io.github.joecqupt.register.RegistryConfig;
@@ -17,13 +18,19 @@ public class RpcClient {
 
     private EventLoopGroup eventLoopGroup;
 
-    public void setRegisterConfig(RegistryConfig registryConfig) {
+    private ProtocolType protocolType;
+
+    public void registerConfig(RegistryConfig registryConfig) {
         this.registryConfig = registryConfig;
     }
 
 
     public void eventLoopGroup(EventLoopGroup eventLoopGroup) {
         this.eventLoopGroup = eventLoopGroup;
+    }
+
+    public void protocolType(ProtocolType protocolType) {
+        this.protocolType = protocolType;
     }
 
     public <T> T importService(T service) {
@@ -33,7 +40,7 @@ public class RpcClient {
         // 创建代理
         Class<?> clazz = service.getClass();
         T proxy = (T) Proxy.newProxyInstance(clazz.getClassLoader(),
-                new Class[]{clazz}, new RpcClientProxy(register, eventLoopGroup ));
+                new Class[]{clazz}, new RpcClientProxy(register, eventLoopGroup, protocolType));
 
         ConsumerInfo consumerInfo = new ConsumerInfo();
         consumerInfo.setRpcMethods(ReflectionUtils.getMethods(service.getClass(), RpcMethod.class));

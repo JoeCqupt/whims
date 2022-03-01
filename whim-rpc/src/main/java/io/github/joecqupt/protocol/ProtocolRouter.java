@@ -1,6 +1,7 @@
 package io.github.joecqupt.protocol;
 
 import io.github.joecqupt.exception.NotEnoughException;
+import io.github.joecqupt.serialization.RpcRequest;
 
 import java.nio.ByteBuffer;
 
@@ -20,5 +21,11 @@ public class ProtocolRouter implements Protocol {
         } else {
             throw new NotEnoughException();
         }
+    }
+
+    @Override
+    public DataPackage writeData(RpcRequest rpcRequest) {
+        // do nothing
+        return null;
     }
 }

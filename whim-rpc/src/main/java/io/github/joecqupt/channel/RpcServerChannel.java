@@ -66,8 +66,8 @@ public class RpcServerChannel extends AbstractRpcChannel implements RpcChannel {
     }
 
     @Override
-    public void write(ByteBuffer data) {
-        writeBuffer.add(data);
+    public void write(Object data) {
+        writeBuffer.add((ByteBuffer) data);
     }
 
     @Override

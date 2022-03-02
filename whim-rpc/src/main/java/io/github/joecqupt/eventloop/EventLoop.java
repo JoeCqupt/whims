@@ -18,7 +18,7 @@ public class EventLoop extends Thread {
     public EventLoop() {
         try {
             selector = Selector.open();
-            this.start();
+            this.setName("EventLoopThread-" + hashCode());
         } catch (Exception e) {
             throw new RuntimeException("init eventLoop ex", e);
         }
@@ -30,7 +30,7 @@ public class EventLoop extends Thread {
 
     @Override
     public void run() {
-        while (interrupted()) {
+        while (!interrupted()) {
             try {
                 int select = selector.select(selectTimeOut);
                 if (select > 0) {
@@ -50,6 +50,8 @@ public class EventLoop extends Thread {
             RpcChannel rpcChannel = (RpcChannel) key.attachment();
             if (key.isReadable()) {
                 rpcChannel.read();
+            } else if (key.isConnectable()) {
+                rpcChannel.finishConnect();
             } else {
                 rpcChannel.flush();
             }

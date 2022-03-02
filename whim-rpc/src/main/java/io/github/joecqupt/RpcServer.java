@@ -16,6 +16,7 @@ import java.util.List;
 public class RpcServer {
     private RegistryConfig registryConfig;
     private int port;
+    private EventLoopGroup eventLoopGroup;
 
     public void setPort(int port) {
         this.port = port;
@@ -37,13 +38,14 @@ public class RpcServer {
         register.register(providerInfo);
     }
 
+    public void eventLoopGroup(EventLoopGroup eventLoopGroup) {
+        this.eventLoopGroup = eventLoopGroup;
+    }
+
     /**
      * start the server
      */
     public void start() throws IOException {
-        ServerBootstrap.build()
-                .bind(new InetSocketAddress(port))
-                .workEventLoopGroup(new EventLoopGroup(Runtime.getRuntime().availableProcessors()))
-                .start();
+        ServerBootstrap.build().bind(new InetSocketAddress(port)).workEventLoopGroup(eventLoopGroup).start();
     }
 }

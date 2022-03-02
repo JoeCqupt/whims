@@ -14,7 +14,9 @@ public class EventLoopGroup {
     public EventLoopGroup(int size)  {
         eventLoops = new ArrayList<EventLoop>(size);
         for (int i = 0; i < size; i++) {
-            eventLoops.add(new EventLoop());
+            EventLoop eventLoop = new EventLoop();
+            eventLoops.add(eventLoop);
+            eventLoop.start();
         }
     }
 
@@ -26,8 +28,9 @@ public class EventLoopGroup {
 
     private EventLoop chooseEventLoop() {
         // 随机选一个
-        int i = random.nextInt();
+        int i = Math.abs(random.nextInt());
         int size = eventLoops.size();
+
         return eventLoops.get(i % size);
     }
 }

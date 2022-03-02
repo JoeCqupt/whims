@@ -19,19 +19,19 @@ public class RpcClientChannel extends AbstractRpcChannel implements RpcChannel {
     private List<ByteBuffer> writeBuffer = new ArrayList<>();
 
     private SocketChannel socketChannel;
-    private ChannelPipeline pipeline;
     private static final Logger LOG = LoggerFactory.getLogger(RpcClientChannel.class);
 
     public RpcClientChannel(SocketChannel socketChannel, ChannelPipeline pipeline) {
         this.socketChannel = socketChannel;
         this.pipeline = pipeline;
+        pipeline.setChannel(this);
     }
 
     @Override
     public void register(EventLoop eventLoop) {
         Selector selector = eventLoop.getSelector();
         try {
-            socketChannel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE, this);
+            socketChannel.register(selector, SelectionKey.OP_CONNECT | SelectionKey.OP_READ | SelectionKey.OP_WRITE, this);
         } catch (ClosedChannelException e) {
             throw new RuntimeException(e);
         }
@@ -65,6 +65,16 @@ public class RpcClientChannel extends AbstractRpcChannel implements RpcChannel {
             } catch (IOException e) {
                 //  todo build exception
             }
+        }
+    }
+
+    @Override
+    public void finishConnect() {
+        try {
+            socketChannel.finishConnect();
+        } catch (IOException e) {
+            // todo
+            throw new RuntimeException(e);
         }
     }
 }

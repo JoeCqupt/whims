@@ -8,6 +8,10 @@ import java.net.SocketAddress;
 public class TailContext extends AbstractChannelContext implements ChannelContext {
     private static final Logger LOG = LoggerFactory.getLogger(TailContext.class);
 
+    public TailContext(DefaultChannelPipeline pipeline) {
+        this.pipeline = pipeline;
+    }
+
     @Override
     public void channelRead(ChannelContext context, Object buf) {
         // 丢弃

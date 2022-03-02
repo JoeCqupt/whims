@@ -21,4 +21,6 @@ public interface RpcChannel {
     void flush();
 
     ChannelPipeline pipeline();
+
+    void finishConnect();
 }

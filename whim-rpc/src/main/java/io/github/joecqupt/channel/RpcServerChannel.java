@@ -80,4 +80,9 @@ public class RpcServerChannel extends AbstractRpcChannel implements RpcChannel {
             }
         }
     }
+
+    @Override
+    public void finishConnect() {
+
+    }
 }

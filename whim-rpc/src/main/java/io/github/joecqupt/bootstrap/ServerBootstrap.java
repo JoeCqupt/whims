@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -25,6 +26,7 @@ public class ServerBootstrap {
 
     private ServerSocketChannel serverSocketChannel;
     private EventLoopGroup eventLoopGroup;
+    private InetSocketAddress socketAddress;
 
     private ServerBootstrap(ServerSocketChannel serverSocketChannel) {
         this.serverSocketChannel = serverSocketChannel;
@@ -41,7 +43,8 @@ public class ServerBootstrap {
         return this;
     }
 
-    public ServerBootstrap bind(SocketAddress socketAddress) throws IOException {
+    public ServerBootstrap bind(InetSocketAddress socketAddress) throws IOException {
+        this.socketAddress = socketAddress;
         this.serverSocketChannel.bind(socketAddress);
         return this;
     }
@@ -49,6 +52,7 @@ public class ServerBootstrap {
     public void start() throws IOException {
         ServerAcceptor serverAcceptor = new ServerAcceptor(this.serverSocketChannel);
         serverAcceptor.start();
+        LOG.info("[RpcServer]ServerAcceptor started. listen port:{}", socketAddress.getPort());
     }
 
     class ServerAcceptor extends Thread {
@@ -71,8 +75,10 @@ public class ServerBootstrap {
                         Set<SelectionKey> keys = selector.selectedKeys();
                         Iterator<SelectionKey> iterator = keys.iterator();
                         while (iterator.hasNext()) {
+                            iterator.next();
                             iterator.remove();
                             SocketChannel socketChannel = serverSocketChannel.accept();
+                            socketChannel.configureBlocking(false);
                             // init pipe
                             ChannelPipeline pipeline = new DefaultChannelPipeline();
                             pipeline.addLast(new RpcCodecHandler());

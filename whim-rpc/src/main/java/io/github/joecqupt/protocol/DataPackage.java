@@ -7,9 +7,13 @@ import java.nio.ByteBuffer;
 
 public interface DataPackage {
 
-    RpcRequest deserialize();
+    RpcRequest deserializeRequest();
+
+    RpcResponse deserializeResponse();
 
     DataPackage serialize(RpcResponse rpcResponse);
+
+    DataPackage serialize(RpcRequest rpcRequest);
 
     ByteBuffer toByteBuffer();
 

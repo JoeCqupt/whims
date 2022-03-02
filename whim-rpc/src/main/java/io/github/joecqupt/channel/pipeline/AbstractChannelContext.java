@@ -13,8 +13,6 @@ public abstract class AbstractChannelContext implements ChannelContext {
 
     protected DefaultChannelPipeline pipeline;
 
-    protected AbstractChannelContext head = new HeadContext();
-    protected AbstractChannelContext tail = new TailContext();
 
     @Override
     public ChannelPipeline pipeline() {
@@ -23,8 +21,8 @@ public abstract class AbstractChannelContext implements ChannelContext {
 
     @Override
     public void fireChannelRead(Object msg) {
-        if (next == tail) {
-            tail.channelRead(tail, msg);
+        if (next instanceof TailContext) {
+            next.channelRead(next, msg);
         } else {
             // 触发后续的context
             ((ChannelInboundHandler) next.channelHandler).channelRead(next, msg);
@@ -33,8 +31,8 @@ public abstract class AbstractChannelContext implements ChannelContext {
 
     @Override
     public void write(Object msg) {
-        if (prev == head) {
-            head.write(head, msg);
+        if (prev instanceof HeadContext) {
+            prev.write(prev, msg);
         } else {
             ((ChannelOutboundHandler) prev.channelHandler).write(prev, msg);
         }

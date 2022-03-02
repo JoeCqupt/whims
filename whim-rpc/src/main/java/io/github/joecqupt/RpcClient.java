@@ -33,17 +33,18 @@ public class RpcClient {
         this.protocolType = protocolType;
     }
 
-    public <T> T importService(T service) {
+    public <T> T importService(Class<T> serviceClazz) {
         // 订阅服务注册信息
         Registry register = RegistryManager.getRegister(registryConfig);
-
+        if (!serviceClazz.isInterface()) {
+            throw new IllegalStateException("importService must be interface");
+        }
         // 创建代理
-        Class<?> clazz = service.getClass();
-        T proxy = (T) Proxy.newProxyInstance(clazz.getClassLoader(),
-                new Class[]{clazz}, new RpcClientProxy(register, eventLoopGroup, protocolType));
+        Class<?> clazz = serviceClazz;
+        T proxy = (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, new RpcClientProxy(register, eventLoopGroup, protocolType));
 
         ConsumerInfo consumerInfo = new ConsumerInfo();
-        consumerInfo.setRpcMethods(ReflectionUtils.getMethods(service.getClass(), RpcMethod.class));
+        consumerInfo.setRpcMethods(ReflectionUtils.getMethods(clazz, RpcMethod.class));
         register.subscribe(consumerInfo);
         return proxy;
     }

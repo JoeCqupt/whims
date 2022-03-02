@@ -6,6 +6,10 @@ import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 
 public class HeadContext extends AbstractChannelContext implements ChannelContext {
+    public HeadContext(DefaultChannelPipeline pipeline) {
+        this.pipeline = pipeline;
+    }
+
     @Override
     public void channelRead(ChannelContext context, Object buf) {
         context.fireChannelRead(buf);

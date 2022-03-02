@@ -10,10 +10,14 @@ import java.net.SocketAddress;
 public class DefaultChannelPipeline extends AbstractChannelContext implements ChannelContext, ChannelPipeline {
     private RpcChannel channel;
 
+    protected AbstractChannelContext head;
+    protected AbstractChannelContext tail;
 
 
 
     public DefaultChannelPipeline() {
+        head = new HeadContext(this);
+        tail = new TailContext(this);
         head.next = tail;
         tail.prev = head;
     }

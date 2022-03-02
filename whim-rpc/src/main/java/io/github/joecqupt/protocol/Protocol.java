@@ -1,6 +1,7 @@
 package io.github.joecqupt.protocol;
 
 import io.github.joecqupt.serialization.RpcRequest;
+import io.github.joecqupt.serialization.RpcResponse;
 
 import java.nio.ByteBuffer;
 
@@ -9,5 +10,7 @@ public interface Protocol {
 
     DataPackage readData(ByteBuffer buffer);
 
-    DataPackage writeData(RpcRequest rpcRequest);
+    DataPackage writeRequestData(RpcRequest rpcRequest);
+
+    DataPackage writeResponseData(RpcResponse rpcResponse);
 }

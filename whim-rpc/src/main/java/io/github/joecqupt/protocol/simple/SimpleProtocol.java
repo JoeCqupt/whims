@@ -2,17 +2,21 @@ package io.github.joecqupt.protocol.simple;
 
 import io.github.joecqupt.exception.NotEnoughException;
 import io.github.joecqupt.protocol.DataPackage;
+import io.github.joecqupt.protocol.DataPackageFactory;
 import io.github.joecqupt.protocol.Protocol;
+import io.github.joecqupt.protocol.ProtocolType;
 import io.github.joecqupt.serialization.RpcRequest;
+import io.github.joecqupt.serialization.RpcResponse;
 
 import java.nio.ByteBuffer;
+
+import static io.github.joecqupt.protocol.simple.SimpleDataPackage.PACKAGE_SIZE;
 
 /**
  * custom protocol
  */
 public class SimpleProtocol implements Protocol {
 
-    public static final int PACKAGE_SIZE = 4;
 
     @Override
     public DataPackage readData(ByteBuffer buffer) {
@@ -52,8 +56,16 @@ public class SimpleProtocol implements Protocol {
     }
 
     @Override
-    public DataPackage writeData(RpcRequest rpcRequest) {
-        // todo
-        return null;
+    public DataPackage writeRequestData(RpcRequest rpcRequest) {
+        DataPackage dataPackage = DataPackageFactory.newInstance(ProtocolType.SIMPLE);
+        dataPackage.serialize(rpcRequest);
+        return dataPackage;
+    }
+
+    @Override
+    public DataPackage writeResponseData(RpcResponse rpcResponse) {
+        DataPackage dataPackage = DataPackageFactory.newInstance(ProtocolType.SIMPLE);
+        dataPackage.serialize(rpcResponse);
+        return dataPackage;
     }
 }

@@ -8,9 +8,9 @@ public interface Registry {
 
     void unRegister(ProviderInfo providerInfo);
 
-    void subscribe(ConsumerInfo supplierInfo);
+    void subscribe(ConsumerInfo consumerInfo);
 
-    void unSubscribe(ConsumerInfo supplierInfo);
+    void unSubscribe(ConsumerInfo consumerInfo);
 
     ServiceInstanceStore getInstanceStore();
 }

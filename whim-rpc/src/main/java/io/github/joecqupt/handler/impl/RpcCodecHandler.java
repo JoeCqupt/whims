@@ -3,8 +3,7 @@ package io.github.joecqupt.handler.impl;
 import io.github.joecqupt.channel.pipeline.ChannelContext;
 import io.github.joecqupt.exception.NotEnoughException;
 import io.github.joecqupt.handler.ChannelAdapterHandler;
-import io.github.joecqupt.protocol.DataPackage;
-import io.github.joecqupt.protocol.ProtocolRouter;
+import io.github.joecqupt.protocol.*;
 
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -16,7 +15,6 @@ public class RpcCodecHandler implements ChannelAdapterHandler {
 
     private ByteBuffer bufferCollector = null;
 
-    private ProtocolRouter protocolRouter = new ProtocolRouter();
 
     @Override
     public void channelRead(ChannelContext context, Object buf) {
@@ -33,7 +31,19 @@ public class RpcCodecHandler implements ChannelAdapterHandler {
                 bufferCollector.put(oldBufferCollector.array(), oldBufferCollector.position(), oldBufferCollector.limit());
             }
             bufferCollector.put(buffer.array(), buffer.position(), buffer.limit());
-            DataPackage dataPackage = protocolRouter.readData(bufferCollector);
+
+            DataPackage dataPackage;
+            if (bufferCollector.remaining() >= MASK_SIZE) {
+                buffer.mark();
+                int mask = buffer.getInt();
+                buffer.reset();
+                ProtocolType protocolType = ProtocolType.valueOf(mask);
+                Protocol protocol = ProtocolManger.getProtocol(protocolType);
+                dataPackage = protocol.readData(buffer);
+            } else {
+                throw new NotEnoughException();
+            }
+
             // 压缩bufferCollector内存
             int compactSize = bufferCollector.remaining();
             ByteBuffer oldBufferCollector = bufferCollector;

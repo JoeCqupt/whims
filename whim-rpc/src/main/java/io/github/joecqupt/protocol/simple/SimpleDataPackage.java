@@ -13,7 +13,6 @@ import io.github.joecqupt.serialization.SerializerManager;
 import java.nio.ByteBuffer;
 
 import static io.github.joecqupt.protocol.Protocol.MASK_SIZE;
-import static io.github.joecqupt.protocol.simple.SimpleProtocol.PACKAGE_SIZE;
 
 /**
  * the simple protocol data package desc:
@@ -23,6 +22,10 @@ import static io.github.joecqupt.protocol.simple.SimpleProtocol.PACKAGE_SIZE;
 public class SimpleDataPackage implements DataPackage {
 
     public final static int MASK = 9527;
+    public static final int PACKAGE_SIZE = 4;
+    public static final int HEADER_SIZE = 4;
+    public static final int BODY_SIZE = 4;
+
 
     private int packageSize;
 
@@ -58,7 +61,7 @@ public class SimpleDataPackage implements DataPackage {
     }
 
     @Override
-    public RpcRequest deserialize() {
+    public RpcRequest deserializeRequest() {
         // 反序列化header为RpcRequest.
         Serializer serializer = SerializerManager.getSerializer(SerializeType.JSON);
         RpcMeta rpcMeta = serializer.deserialize(header, RpcMeta.class);
@@ -76,6 +79,12 @@ public class SimpleDataPackage implements DataPackage {
         rpcRequest.setRpcMeta(rpcMeta);
         rpcRequest.setRequest(request);
         return rpcRequest;
+    }
+
+    @Override
+    public RpcResponse deserializeResponse() {
+        // todo
+        return null;
     }
 
 
@@ -96,8 +105,25 @@ public class SimpleDataPackage implements DataPackage {
     }
 
     @Override
+    public DataPackage serialize(RpcRequest rpcRequest) {
+        Serializer serializer = SerializerManager.getSerializer(SerializeType.JSON);
+        byte[] header = serializer.serialize(rpcRequest.getRpcMeta());
+        byte[] body = serializer.serialize(rpcRequest.getRequest());
+        int headerSize = header.length;
+        int bodySize = body.length;
+        int packageSize = headerSize + bodySize;
+
+        this.packageSize = packageSize;
+        this.headerSize = headerSize;
+        this.header = header;
+        this.bodySize = bodySize;
+        this.body = body;
+        return this;
+    }
+
+    @Override
     public ByteBuffer toByteBuffer() {
-        int totalSize = MASK_SIZE + PACKAGE_SIZE + headerSize + bodySize;
+        int totalSize = MASK_SIZE + PACKAGE_SIZE + HEADER_SIZE + headerSize + BODY_SIZE + bodySize;
         // array copy 性能差
         ByteBuffer data = ByteBuffer.allocate(totalSize);
         data.putInt(MASK);

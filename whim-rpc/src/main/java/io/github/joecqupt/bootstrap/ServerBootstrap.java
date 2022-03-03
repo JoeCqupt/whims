@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -75,16 +74,19 @@ public class ServerBootstrap {
                         Set<SelectionKey> keys = selector.selectedKeys();
                         Iterator<SelectionKey> iterator = keys.iterator();
                         while (iterator.hasNext()) {
-                            iterator.next();
+                            SelectionKey key = iterator.next();
+                            if (key.isValid() && key.isAcceptable()) {
+                                SocketChannel socketChannel = serverSocketChannel.accept();
+                                socketChannel.configureBlocking(false);
+                                LOG.debug("accept a new connection:{}", socketChannel.getRemoteAddress());
+                                // init pipe
+                                ChannelPipeline pipeline = new DefaultChannelPipeline();
+                                pipeline.addLast(new RpcCodecHandler());
+                                pipeline.addLast(new RpcServerHandler());
+                                RpcChannel rpcChannel = new RpcServerChannel(socketChannel, pipeline);
+                                eventLoopGroup.register(rpcChannel);
+                            }
                             iterator.remove();
-                            SocketChannel socketChannel = serverSocketChannel.accept();
-                            socketChannel.configureBlocking(false);
-                            // init pipe
-                            ChannelPipeline pipeline = new DefaultChannelPipeline();
-                            pipeline.addLast(new RpcCodecHandler());
-                            pipeline.addLast(new RpcServerHandler());
-                            RpcChannel rpcChannel = new RpcServerChannel(socketChannel, pipeline);
-                            eventLoopGroup.register(rpcChannel);
                         }
                     }
                 } catch (Exception e) {

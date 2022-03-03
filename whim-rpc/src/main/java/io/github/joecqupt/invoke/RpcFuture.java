@@ -4,14 +4,21 @@ import java.util.concurrent.*;
 
 public class RpcFuture implements Future {
 
-    public RpcFuture(int invokeId) {
-        this.invokeId = invokeId;
-    }
 
     private int invokeId;
+    private Class<?> returnType;
     private Object res;
 
+    public Class<?> getReturnType() {
+        return returnType;
+    }
+
     private CountDownLatch countDown = new CountDownLatch(1);
+
+    public RpcFuture(int invokeId, Class<?> returnType) {
+        this.invokeId = invokeId;
+        this.returnType = returnType;
+    }
 
     @Override
     public boolean cancel(boolean mayInterruptIfRunning) {

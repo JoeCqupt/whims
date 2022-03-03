@@ -31,24 +31,29 @@ public class RpcCodecHandler implements ChannelAdapterHandler {
                 bufferCollector.put(oldBufferCollector.array(), oldBufferCollector.position(), oldBufferCollector.limit());
             }
             bufferCollector.put(buffer.array(), buffer.position(), buffer.limit());
+            bufferCollector.flip();
 
             DataPackage dataPackage;
             if (bufferCollector.remaining() >= MASK_SIZE) {
-                buffer.mark();
-                int mask = buffer.getInt();
-                buffer.reset();
+                bufferCollector.mark();
+                int mask = bufferCollector.getInt();
+                bufferCollector.reset();
                 ProtocolType protocolType = ProtocolType.valueOf(mask);
                 Protocol protocol = ProtocolManger.getProtocol(protocolType);
-                dataPackage = protocol.readData(buffer);
+                dataPackage = protocol.readData(bufferCollector);
             } else {
                 throw new NotEnoughException();
             }
 
             // 压缩bufferCollector内存
             int compactSize = bufferCollector.remaining();
-            ByteBuffer oldBufferCollector = bufferCollector;
-            bufferCollector = ByteBuffer.allocate(compactSize);
-            bufferCollector.put(oldBufferCollector.array(), oldBufferCollector.position(), oldBufferCollector.limit());
+            if (compactSize == 0) {
+                bufferCollector = null;
+            } else {
+                ByteBuffer oldBufferCollector = bufferCollector;
+                bufferCollector = ByteBuffer.allocate(compactSize);
+                bufferCollector.put(oldBufferCollector.array(), oldBufferCollector.position(), oldBufferCollector.limit());
+            }
             // 让后续处理这个数据包
             context.fireChannelRead(dataPackage);
         } catch (NotEnoughException nee) {

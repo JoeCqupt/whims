@@ -57,7 +57,7 @@ public class RpcClientProxy implements InvocationHandler {
             rpcRequest.setRequest(req);
             channel.pipeline().write(rpcRequest);
             // 获取返回信息
-            RpcFuture future = FutureStore.buildFuture(invokeId);
+            RpcFuture future = FutureStore.buildFuture(invokeId, method.getReturnType());
             // 同步请求方式
             return future.get();
         }

@@ -29,8 +29,8 @@ public class RpcServer {
     /**
      * export a service interface
      */
-    public void export(Object service) {
-        List<Method> rpcMethods = ServiceManager.registerService(service);
+    public void export(Class<?> interfaze , Object service) {
+        List<Method> rpcMethods = ServiceManager.registerService(interfaze, service);
         Registry register = RegistryManager.getRegister(registryConfig);
         ProviderInfo providerInfo = new ProviderInfo();
         providerInfo.setRpcMethods(rpcMethods);

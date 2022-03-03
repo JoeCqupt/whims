@@ -14,7 +14,7 @@ public class EchoConsumer {
 
     public static void main(String[] args) {
         RpcClient rpcClient = new RpcClient();
-        rpcClient.eventLoopGroup(new EventLoopGroup(4));
+        rpcClient.eventLoopGroup(new EventLoopGroup(1));
         rpcClient.protocolType(ProtocolType.SIMPLE);
         RegistryConfig registryConfig = new RegistryConfig();
         registryConfig.setRegisterType(RegistryType.END_POINTS);

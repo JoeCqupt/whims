@@ -1,5 +1,7 @@
 package io.github.joecqupt.protocol.simple;
 
+import io.github.joecqupt.invoke.FutureStore;
+import io.github.joecqupt.invoke.RpcFuture;
 import io.github.joecqupt.invoke.ServiceManager;
 import io.github.joecqupt.protocol.DataPackage;
 import io.github.joecqupt.protocol.ProtocolType;
@@ -62,7 +64,7 @@ public class SimpleDataPackage implements DataPackage {
 
     @Override
     public RpcRequest deserializeRequest() {
-        // 反序列化header为RpcRequest.
+        // 反序列化为RpcRequest.
         Serializer serializer = SerializerManager.getSerializer(SerializeType.JSON);
         RpcMeta rpcMeta = serializer.deserialize(header, RpcMeta.class);
         rpcMeta.setProtocolType(ProtocolType.SIMPLE);
@@ -83,8 +85,17 @@ public class SimpleDataPackage implements DataPackage {
 
     @Override
     public RpcResponse deserializeResponse() {
-        // todo
-        return null;
+        // 反序列化为RpcResponse.
+        Serializer serializer = SerializerManager.getSerializer(SerializeType.JSON);
+        RpcMeta rpcMeta = serializer.deserialize(header, RpcMeta.class);
+
+        RpcFuture future = FutureStore.getFuture(rpcMeta.getInvokeId());
+        Class<?> returnType = future.getReturnType();
+        Object response = serializer.deserialize(body, returnType);
+
+        RpcResponse rpcResponse = new RpcResponse(rpcMeta, response);
+
+        return rpcResponse;
     }
 
 
@@ -95,7 +106,7 @@ public class SimpleDataPackage implements DataPackage {
         int headerSize = header.length;
         byte[] body = serializer.serialize(rpcResponse.getResponse());
         int bodySize = body.length;
-        int packageSize = headerSize + bodySize;
+        int packageSize = HEADER_SIZE + headerSize + BODY_SIZE + bodySize;
         this.packageSize = packageSize;
         this.headerSize = headerSize;
         this.header = header;
@@ -111,8 +122,7 @@ public class SimpleDataPackage implements DataPackage {
         byte[] body = serializer.serialize(rpcRequest.getRequest());
         int headerSize = header.length;
         int bodySize = body.length;
-        int packageSize = headerSize + bodySize;
-
+        int packageSize = HEADER_SIZE + headerSize + BODY_SIZE + bodySize;
         this.packageSize = packageSize;
         this.headerSize = headerSize;
         this.header = header;
@@ -132,6 +142,8 @@ public class SimpleDataPackage implements DataPackage {
         data.put(header);
         data.putInt(bodySize);
         data.put(body);
+        // fuxk nio buffer
+        data.flip();
         return data;
     }
 }

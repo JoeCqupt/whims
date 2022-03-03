@@ -22,6 +22,8 @@ public class RpcServerChannel extends AbstractRpcChannel implements RpcChannel {
 
     private List<ByteBuffer> writeBuffer = new ArrayList<>();
 
+    private SelectionKey key;
+
     /**
      * 每次默认读取多大的信息
      */
@@ -37,7 +39,7 @@ public class RpcServerChannel extends AbstractRpcChannel implements RpcChannel {
     public void register(EventLoop eventLoop) {
         Selector selector = eventLoop.getSelector();
         try {
-            socketChannel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE, this);
+            key = socketChannel.register(selector, SelectionKey.OP_READ, this);
         } catch (ClosedChannelException e) {
             throw new RuntimeException(e);
         }
@@ -59,6 +61,8 @@ public class RpcServerChannel extends AbstractRpcChannel implements RpcChannel {
         try {
             ByteBuffer buffer = ByteBuffer.allocate(defaultReadBufferSize);
             socketChannel.read(buffer);
+            LOG.debug("reading data...");
+            buffer.flip();
             pipeline.fireChannelRead(buffer);
         } catch (IOException ioe) {
             // todo build response
@@ -68,6 +72,8 @@ public class RpcServerChannel extends AbstractRpcChannel implements RpcChannel {
     @Override
     public void write(Object data) {
         writeBuffer.add((ByteBuffer) data);
+
+        key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
     }
 
     @Override
@@ -79,6 +85,9 @@ public class RpcServerChannel extends AbstractRpcChannel implements RpcChannel {
                 //  todo build response
             }
         }
+        writeBuffer.clear();
+
+        key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
     }
 
     @Override

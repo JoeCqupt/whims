@@ -19,6 +19,13 @@ public class RpcClientChannel extends AbstractRpcChannel implements RpcChannel {
     private List<ByteBuffer> writeBuffer = new ArrayList<>();
 
     private SocketChannel socketChannel;
+
+    /**
+     * 每次默认读取多大的信息
+     */
+    private static int defaultReadBufferSize = 512;
+
+    private SelectionKey key;
     private static final Logger LOG = LoggerFactory.getLogger(RpcClientChannel.class);
 
     public RpcClientChannel(SocketChannel socketChannel, ChannelPipeline pipeline) {
@@ -31,7 +38,7 @@ public class RpcClientChannel extends AbstractRpcChannel implements RpcChannel {
     public void register(EventLoop eventLoop) {
         Selector selector = eventLoop.getSelector();
         try {
-            socketChannel.register(selector, SelectionKey.OP_CONNECT | SelectionKey.OP_READ | SelectionKey.OP_WRITE, this);
+            key = socketChannel.register(selector, SelectionKey.OP_CONNECT, this);
         } catch (ClosedChannelException e) {
             throw new RuntimeException(e);
         }
@@ -49,12 +56,21 @@ public class RpcClientChannel extends AbstractRpcChannel implements RpcChannel {
 
     @Override
     public void read() {
-
+        try {
+            ByteBuffer buffer = ByteBuffer.allocate(defaultReadBufferSize);
+            socketChannel.read(buffer);
+            LOG.debug("reading data...");
+            buffer.flip();
+            pipeline.fireChannelRead(buffer);
+        } catch (IOException ioe) {
+            // todo build response
+        }
     }
 
     @Override
     public void write(Object data) {
         writeBuffer.add((ByteBuffer) data);
+        key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
     }
 
     @Override
@@ -62,16 +78,23 @@ public class RpcClientChannel extends AbstractRpcChannel implements RpcChannel {
         for (ByteBuffer buffer : writeBuffer) {
             try {
                 socketChannel.write(buffer);
-            } catch (IOException e) {
+                LOG.debug("flush data ....");
+            } catch (Exception e) {
                 //  todo build exception
             }
         }
+        writeBuffer.clear();
+        key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
+        key.interestOps(key.interestOps() | SelectionKey.OP_READ);
     }
 
     @Override
     public void finishConnect() {
         try {
-            socketChannel.finishConnect();
+            boolean b = socketChannel.finishConnect();
+            if (b) {
+                key.interestOps(SelectionKey.OP_WRITE);
+            }
         } catch (IOException e) {
             // todo
             throw new RuntimeException(e);

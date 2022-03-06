@@ -8,6 +8,7 @@ public class RpcFuture implements Future {
     private int invokeId;
     private Class<?> returnType;
     private Object res;
+    private Exception e;
 
     public Class<?> getReturnType() {
         return returnType;
@@ -34,7 +35,6 @@ public class RpcFuture implements Future {
 
     @Override
     public boolean isDone() {
-
         return countDown.getCount() == 0;
     }
 

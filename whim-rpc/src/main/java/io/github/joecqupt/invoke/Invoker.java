@@ -45,8 +45,7 @@ public class Invoker {
                 RpcResponse rpcResponse = new RpcResponse(rpcMeta, response);
                 channel.pipeline().write(rpcResponse);
             } catch (Exception e) {
-                // todo
-                // build response
+                // todo build response
             }
         }
     }

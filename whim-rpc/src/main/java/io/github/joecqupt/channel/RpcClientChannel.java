@@ -2,6 +2,7 @@ package io.github.joecqupt.channel;
 
 import io.github.joecqupt.channel.pipeline.ChannelPipeline;
 import io.github.joecqupt.eventloop.EventLoop;
+import io.github.joecqupt.exception.RpcException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +81,7 @@ public class RpcClientChannel extends AbstractRpcChannel implements RpcChannel {
                 socketChannel.write(buffer);
                 LOG.debug("flush data ....");
             } catch (Exception e) {
-                //  todo build exception
+                throw new RpcException("fail write data to remote", e);
             }
         }
         writeBuffer.clear();
@@ -96,8 +97,7 @@ public class RpcClientChannel extends AbstractRpcChannel implements RpcChannel {
                 key.interestOps(SelectionKey.OP_WRITE);
             }
         } catch (IOException e) {
-            // todo
-            throw new RuntimeException(e);
+            throw new RpcException("fail connect to remote", e);
         }
     }
 }

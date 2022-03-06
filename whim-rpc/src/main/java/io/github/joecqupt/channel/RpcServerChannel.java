@@ -82,7 +82,7 @@ public class RpcServerChannel extends AbstractRpcChannel implements RpcChannel {
             try {
                 socketChannel.write(buffer);
             } catch (IOException e) {
-                //  todo build response
+                throw new RuntimeException("fail write data to remote", e);
             }
         }
         writeBuffer.clear();

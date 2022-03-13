@@ -7,12 +7,11 @@ import io.github.joecqupt.handler.ChannelOutboundHandler;
 
 import java.net.SocketAddress;
 
-public class DefaultChannelPipeline extends AbstractChannelContext implements ChannelContext, ChannelPipeline {
+public class DefaultChannelPipeline extends AbstractChannelContext implements ChannelPipeline {
     private RpcChannel channel;
 
     protected AbstractChannelContext head;
     protected AbstractChannelContext tail;
-
 
 
     public DefaultChannelPipeline() {

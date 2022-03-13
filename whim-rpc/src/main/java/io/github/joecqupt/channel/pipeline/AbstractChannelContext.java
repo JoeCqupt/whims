@@ -4,7 +4,7 @@ import io.github.joecqupt.handler.ChannelHandler;
 import io.github.joecqupt.handler.ChannelInboundHandler;
 import io.github.joecqupt.handler.ChannelOutboundHandler;
 
-public abstract class AbstractChannelContext implements ChannelContext {
+public abstract class AbstractChannelContext implements  ChannelInboundInvoker, ChannelOutboundInvoker {
 
     protected AbstractChannelContext prev;
     protected AbstractChannelContext next;

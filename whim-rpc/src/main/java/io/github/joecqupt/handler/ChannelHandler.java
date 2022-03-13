@@ -1,7 +1,8 @@
 package io.github.joecqupt.handler;
 
 
+import io.github.joecqupt.channel.pipeline.ChannelContext;
+
 public interface ChannelHandler {
-    // todo handle exception
-//    void exceptionCaught(ChannelContext ctx, Throwable t);
+    void exceptionCaught(ChannelContext ctx, Throwable t);
 }

@@ -1,31 +1,33 @@
 package io.github.joecqupt.handler;
 
 
+import io.github.joecqupt.channel.pipeline.ChannelContext;
+
 import java.net.SocketAddress;
 
-public abstract class ChannelAdapterHandler implements ChannelInboundHandler, ChannelOutboundHandler {
+public abstract class ChannelAdapterHandler implements ChannelInboundHandler, ChannelOutboundHandler, ChannelHandler {
     @Override
     public void exceptionCaught(ChannelContext ctx, Throwable t) {
-        // todo
+        ctx.fireExceptionCaught(t);
     }
 
     @Override
     public void channelRead(ChannelContext context, Object buf) {
-        // todo
+        context.fireChannelRead(buf);
     }
 
     @Override
     public void connect(ChannelContext context, SocketAddress address) {
-        // todo
+        context.connect(address);
     }
 
     @Override
     public void bind(ChannelContext context, SocketAddress address) {
-        // todo
+        context.bind(address);
     }
 
     @Override
     public void write(ChannelContext context, Object msg) {
-        // todo
+        context.write(msg);
     }
 }

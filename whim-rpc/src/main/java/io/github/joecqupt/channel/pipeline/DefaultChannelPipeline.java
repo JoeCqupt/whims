@@ -7,18 +7,22 @@ import io.github.joecqupt.handler.ChannelOutboundHandler;
 
 import java.net.SocketAddress;
 
-public class DefaultChannelPipeline extends AbstractChannelContext implements ChannelPipeline {
+public class DefaultChannelPipeline implements ChannelPipeline, ChannelInboundInvoker, ChannelOutboundInvoker {
     private RpcChannel channel;
 
-    protected AbstractChannelContext head;
-    protected AbstractChannelContext tail;
+    private static ChannelHandler HEAD_HANDLER = new HeadChannelHandler();
+    private static ChannelHandler TAIL_HANDLER = new TailChannelHandler();
+
+    protected DefaultChannelContext head;
+    protected DefaultChannelContext tail;
 
 
-    public DefaultChannelPipeline() {
-        head = new HeadContext(this);
-        tail = new TailContext(this);
+    public DefaultChannelPipeline(RpcChannel channel) {
+        head = new DefaultChannelContext(HEAD_HANDLER, this);
+        tail = new DefaultChannelContext(TAIL_HANDLER, this);
         head.next = tail;
         tail.prev = head;
+        this.channel = channel;
     }
 
     @Override
@@ -26,10 +30,6 @@ public class DefaultChannelPipeline extends AbstractChannelContext implements Ch
         return channel;
     }
 
-    @Override
-    public void setChannel(RpcChannel channel) {
-        this.channel = channel;
-    }
 
     /**
      * 新增channelHandler到tail之前
@@ -38,8 +38,8 @@ public class DefaultChannelPipeline extends AbstractChannelContext implements Ch
      */
     @Override
     public void addLast(ChannelHandler handler) {
-        AbstractChannelContext newCtx = new DefaultChannelContext(handler, this);
-        AbstractChannelContext prev = tail.prev;
+        DefaultChannelContext newCtx = new DefaultChannelContext(handler, this);
+        DefaultChannelContext prev = tail.prev;
 
         newCtx.prev = prev;
         prev.next = newCtx;
@@ -76,5 +76,61 @@ public class DefaultChannelPipeline extends AbstractChannelContext implements Ch
     public void fireChannelRead(Object msg) {
         // 从头开始触发
         head.channelRead(head, msg);
+    }
+
+    static class HeadChannelHandler implements ChannelInboundHandler, ChannelOutboundHandler, ChannelHandler {
+
+        @Override
+        public void exceptionCaught(ChannelContext ctx, Throwable t) {
+
+        }
+
+        @Override
+        public void channelRead(ChannelContext context, Object buf) {
+
+        }
+
+        @Override
+        public void connect(ChannelContext context, SocketAddress address) {
+
+        }
+
+        @Override
+        public void bind(ChannelContext context, SocketAddress address) {
+
+        }
+
+        @Override
+        public void write(ChannelContext context, Object msg) {
+
+        }
+    }
+
+    static class TailChannelHandler implements ChannelInboundHandler, ChannelOutboundHandler, ChannelHandler {
+
+        @Override
+        public void exceptionCaught(ChannelContext ctx, Throwable t) {
+
+        }
+
+        @Override
+        public void channelRead(ChannelContext context, Object buf) {
+
+        }
+
+        @Override
+        public void connect(ChannelContext context, SocketAddress address) {
+
+        }
+
+        @Override
+        public void bind(ChannelContext context, SocketAddress address) {
+
+        }
+
+        @Override
+        public void write(ChannelContext context, Object msg) {
+
+        }
     }
 }

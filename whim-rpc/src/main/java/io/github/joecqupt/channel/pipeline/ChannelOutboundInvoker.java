@@ -2,7 +2,7 @@ package io.github.joecqupt.channel.pipeline;
 
 import java.net.SocketAddress;
 
-public class ChannelOutboundInvoker {
+public interface ChannelOutboundInvoker {
 
     void connect(SocketAddress address);
 

@@ -1,4 +1,4 @@
-package io.whim.transport.handler;
+package io.whim.rpc.transport.handler;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;

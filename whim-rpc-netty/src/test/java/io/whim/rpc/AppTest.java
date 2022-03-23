@@ -1,4 +1,4 @@
-package io.whim;
+package io.whim.rpc;
 
 import static org.junit.Assert.assertTrue;
 

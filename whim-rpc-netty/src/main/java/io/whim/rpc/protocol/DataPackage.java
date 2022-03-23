@@ -1,4 +1,4 @@
-package io.whim.protocol;
+package io.whim.rpc.protocol;
 
 public interface DataPackage {
 }

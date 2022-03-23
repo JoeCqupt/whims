@@ -1,4 +1,4 @@
-package io.whim.boot;
+package io.whim.rpc;
 
 public class RpcServer {
 

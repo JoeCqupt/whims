@@ -1,9 +1,9 @@
-package io.whim.transport.handler;
+package io.whim.rpc.transport.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
-import io.whim.protocol.DataPackage;
+import io.whim.rpc.protocol.DataPackage;
 
 import java.util.List;
 

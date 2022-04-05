@@ -22,15 +22,7 @@ public interface RaftProtocol {
      * @param request
      * @return
      */
-    AppendEntryResponse appendEntry(AppendEntryRequest request);
-
-    /**
-     * join group
-     *
-     * @param request
-     * @return
-     */
-    JoinGroupResponse joinGroup(JoinGroupRequest request);
+    AppendEntriesResponse appendEntries(AppendEntriesRequest request);
 
     /**
      * install snapshot

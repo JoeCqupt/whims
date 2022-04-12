@@ -5,7 +5,7 @@ import io.whim.rpc.protocol.simple.SimpleProtocol;
 public enum ProtocolType {
     SIMPLE;
 
-    ProtocolType valueOf(int mask) {
+    public static ProtocolType valueOf(int mask) {
         if (mask == SimpleProtocol.SIMPLE_PROTOCOL_MASK) {
             return SIMPLE;
         }

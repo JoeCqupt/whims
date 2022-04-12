@@ -1,4 +1,12 @@
 package io.whim.rpc.transport.handler;
 
-public class RpcClientHandler {
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+
+public class RpcClientHandler extends ChannelInboundHandlerAdapter {
+
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        // todo
+    }
 }

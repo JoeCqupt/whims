@@ -13,11 +13,11 @@ public interface Protocol {
 
     int getProtocolMask();
 
-    RpcRequest decodeRequest(ByteBuf data);
+    DataPackage decodeRequestData(ByteBuf data);
 
-    ByteBuf encodeRequest(RpcRequest request);
+    DataPackage encodeRequestData(RpcRequest request);
 
-    RpcResponse decodeResponse(ByteBuf data);
+    DataPackage decodeResponseData(ByteBuf data);
 
-    ByteBuf encodeResponse(RpcResponse response);
+    DataPackage encodeResponseData(RpcResponse response);
 }

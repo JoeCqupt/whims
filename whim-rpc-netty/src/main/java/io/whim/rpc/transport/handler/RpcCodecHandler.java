@@ -30,8 +30,8 @@ public class RpcCodecHandler extends ByteToMessageCodec<DataPackage> {
         ProtocolType protocolType = ProtocolType.valueOf(protocolCode);
         Protocol protocol = ProtocolManager.getProtocol(protocolType);
         try {
-            DataPackage dataPackage = protocol.decodeRequestData(in);
-            // 反序列化
+            DataPackage dataPackage = protocol.readData(in);
+            out.add(dataPackage);
         } catch (NotEnoughException e) {
             // ignore
             return;

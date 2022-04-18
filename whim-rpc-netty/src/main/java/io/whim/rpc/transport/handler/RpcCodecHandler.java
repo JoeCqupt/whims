@@ -8,6 +8,7 @@ import io.whim.rpc.protocol.DataPackage;
 import io.whim.rpc.protocol.Protocol;
 import io.whim.rpc.protocol.ProtocolManager;
 import io.whim.rpc.protocol.ProtocolType;
+import io.whim.rpc.service.invoke.RpcRequest;
 
 import java.util.List;
 
@@ -30,8 +31,10 @@ public class RpcCodecHandler extends ByteToMessageCodec<DataPackage> {
         ProtocolType protocolType = ProtocolType.valueOf(protocolCode);
         Protocol protocol = ProtocolManager.getProtocol(protocolType);
         try {
-            DataPackage dataPackage = protocol.decodeRequestData(in);
+            DataPackage dataPackage = protocol.readData(in);
             // 反序列化
+            RpcRequest rpcRequest = dataPackage.deserializeRequest();
+            out.add(rpcRequest);
         } catch (NotEnoughException e) {
             // ignore
             return;

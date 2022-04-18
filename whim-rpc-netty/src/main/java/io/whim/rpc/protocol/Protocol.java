@@ -1,6 +1,7 @@
 package io.whim.rpc.protocol;
 
 import io.netty.buffer.ByteBuf;
+import io.whim.rpc.serialize.Serializer;
 import io.whim.rpc.service.invoke.RpcRequest;
 import io.whim.rpc.service.invoke.RpcResponse;
 
@@ -13,11 +14,11 @@ public interface Protocol {
 
     int getProtocolMask();
 
-    DataPackage decodeRequestData(ByteBuf data);
 
-    DataPackage encodeRequestData(RpcRequest request);
+    DataPackage readData(ByteBuf data);
 
-    DataPackage decodeResponseData(ByteBuf data);
+    DataPackage writeRequestData(RpcRequest request);
 
-    DataPackage encodeResponseData(RpcResponse response);
+    DataPackage writeResponseData(RpcResponse response);
+
 }

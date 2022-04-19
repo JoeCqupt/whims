@@ -20,11 +20,6 @@ public class SimpleProtocol implements Protocol {
 
 
     @Override
-    public int getProtocolMask() {
-        return SIMPLE_PROTOCOL_MASK;
-    }
-
-    @Override
     public DataPackage readData(ByteBuf data) {
         int min = Protocol.PROTOCOL_MASK_SIZE + SimpleDataPackage.PACKAGE_SIZE_LENGTH;
         if (data.readableBytes() < min) {
@@ -55,12 +50,16 @@ public class SimpleProtocol implements Protocol {
 
     @Override
     public DataPackage writeRequestData(RpcRequest request) {
-        return null;
+        SimpleDataPackage dataPackage = new SimpleDataPackage();
+        dataPackage.serialize(request);
+        return dataPackage;
     }
 
     @Override
     public DataPackage writeResponseData(RpcResponse response) {
-        return null;
+        SimpleDataPackage dataPackage = new SimpleDataPackage();
+        dataPackage.serialize(response);
+        return dataPackage;
     }
 
 }

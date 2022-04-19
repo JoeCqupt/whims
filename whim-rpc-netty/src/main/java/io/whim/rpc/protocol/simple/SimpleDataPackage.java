@@ -2,6 +2,7 @@ package io.whim.rpc.protocol.simple;
 
 import io.netty.buffer.ByteBuf;
 import io.whim.rpc.protocol.DataPackage;
+import io.whim.rpc.protocol.ProtocolType;
 import io.whim.rpc.serialize.Serializer;
 import io.whim.rpc.serialize.SerializerManager;
 import io.whim.rpc.service.ServiceManager;
@@ -38,8 +39,17 @@ public class SimpleDataPackage implements DataPackage {
     private ByteBuf bodyData;
 
     @Override
-    public RpcRequest deserializeRequest() {
+    public int getProtocolMaskCode() {
+        return SimpleProtocol.SIMPLE_PROTOCOL_MASK;
+    }
 
+    @Override
+    public ProtocolType getProtocolType() {
+        return ProtocolType.SIMPLE;
+    }
+
+    @Override
+    public RpcRequest deserializeRequest() {
         RpcMeta rpcMeta = serializer.deserialize(headerData.array(), RpcMeta.class);
         String apiKey = rpcMeta.getApiKey();
         ApiInfo apiInfo = ServiceManager.getApiInfo(apiKey);
@@ -48,7 +58,6 @@ public class SimpleDataPackage implements DataPackage {
         }
         Class<?> paramterType = apiInfo.getParamterType();
         Object reuqet = serializer.deserialize(bodyData.array(), paramterType);
-
         RpcRequest rpcRequest = new RpcRequest();
         rpcRequest.setMeta(rpcMeta);
         rpcRequest.setRequest(reuqet);

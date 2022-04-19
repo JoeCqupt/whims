@@ -5,6 +5,10 @@ import io.whim.rpc.service.invoke.RpcResponse;
 
 public interface DataPackage {
 
+    int getProtocolMaskCode();
+
+    ProtocolType getProtocolType();
+
     RpcRequest deserializeRequest();
 
     RpcResponse deserializeResponse();

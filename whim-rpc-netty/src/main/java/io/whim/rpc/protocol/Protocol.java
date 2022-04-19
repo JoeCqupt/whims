@@ -12,7 +12,6 @@ public interface Protocol {
      */
     int PROTOCOL_MASK_SIZE = 4;
 
-    int getProtocolMask();
 
 
     DataPackage readData(ByteBuf data);

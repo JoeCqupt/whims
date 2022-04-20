@@ -12,7 +12,7 @@ public class ServiceManager {
         return apiMap.get(apiKey);
     }
 
-    public static void putApiInfo(String apiKey, ApiInfo apiInfo) {
-        apiMap.put(apiKey, apiInfo);
+    public static void registerService(Class<?> interfaceClass, Object service) {
+        // todo
     }
 }

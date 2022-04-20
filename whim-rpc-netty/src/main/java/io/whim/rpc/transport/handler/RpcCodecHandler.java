@@ -16,7 +16,7 @@ public class RpcCodecHandler extends ByteToMessageCodec<DataPackage> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, DataPackage dataPackage, ByteBuf out) throws Exception {
-        // todo
+        dataPackage.writeData(out);
     }
 
     @Override

@@ -2,7 +2,7 @@ package io.whim.rpc.transport.handler;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.whim.rpc.service.ServiceManager;
+import io.whim.rpc.service.LocalServiceManager;
 import io.whim.rpc.service.api.ApiInfo;
 import io.whim.rpc.service.invoke.RpcMeta;
 import io.whim.rpc.service.invoke.RpcRequest;
@@ -17,7 +17,7 @@ public class RpcServerHandler extends ChannelInboundHandlerAdapter {
         RpcRequest rpcRequest = (RpcRequest) msg;
         RpcMeta meta = rpcRequest.getMeta();
         String apiKey = meta.getApiKey();
-        ApiInfo apiInfo = ServiceManager.getApiInfo(apiKey);
+        ApiInfo apiInfo = LocalServiceManager.getApiInfo(apiKey);
         Method method = apiInfo.getMethod();
         Object service = apiInfo.getService();
         Object result = method.invoke(service, rpcRequest.getRequest());

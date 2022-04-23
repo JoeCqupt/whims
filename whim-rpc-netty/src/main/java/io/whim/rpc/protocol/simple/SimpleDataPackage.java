@@ -6,7 +6,7 @@ import io.whim.rpc.protocol.ProtocolType;
 import io.whim.rpc.serialize.SerializeType;
 import io.whim.rpc.serialize.Serializer;
 import io.whim.rpc.serialize.SerializerManager;
-import io.whim.rpc.service.ServiceManager;
+import io.whim.rpc.service.LocalServiceManager;
 import io.whim.rpc.service.api.ApiInfo;
 import io.whim.rpc.service.invoke.RpcMeta;
 import io.whim.rpc.service.invoke.RpcRequest;
@@ -60,11 +60,11 @@ public class SimpleDataPackage implements DataPackage {
     public RpcRequest deserializeRequest() {
         RpcMeta rpcMeta = serializer.deserialize(headerData, RpcMeta.class);
         String apiKey = rpcMeta.getApiKey();
-        ApiInfo apiInfo = ServiceManager.getApiInfo(apiKey);
+        ApiInfo apiInfo = LocalServiceManager.getApiInfo(apiKey);
         if (apiInfo == null) {
             throw new IllegalStateException("api not found! api:" + apiKey);
         }
-        Class<?> paramterType = apiInfo.getParamterType();
+        Class<?> paramterType = apiInfo.getParameterType();
         Object reuqet = serializer.deserialize(bodyData, paramterType);
         RpcRequest rpcRequest = new RpcRequest();
         rpcRequest.setMeta(rpcMeta);

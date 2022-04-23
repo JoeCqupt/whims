@@ -13,17 +13,11 @@ public class ApiInfo {
 
     private Object service;
 
-    private Class<?> paramterType;
+    private Class<?> parameterType;
 
     private Class<?> returnType;
 
-    public ApiInfo(Class<?> serviceClass, Method method, Object service) {
-        this.serviceClass = serviceClass;
-        this.method = method;
-        this.service = service;
-        this.paramterType = method.getParameterTypes()[0];
-        this.returnType = method.getReturnType();
-    }
+
 
     public Class<?> getServiceClass() {
         return serviceClass;
@@ -49,12 +43,12 @@ public class ApiInfo {
         this.service = service;
     }
 
-    public Class<?> getParamterType() {
-        return paramterType;
+    public Class<?> getParameterType() {
+        return parameterType;
     }
 
-    public void setParamterType(Class<?> paramterType) {
-        this.paramterType = paramterType;
+    public void setParameterType(Class<?> parameterType) {
+        this.parameterType = parameterType;
     }
 
     public Class<?> getReturnType() {
@@ -71,6 +65,8 @@ public class ApiInfo {
                 "serviceClass=" + serviceClass +
                 ", method=" + method +
                 ", service=" + service +
+                ", parameterType=" + parameterType +
+                ", returnType=" + returnType +
                 '}';
     }
 }

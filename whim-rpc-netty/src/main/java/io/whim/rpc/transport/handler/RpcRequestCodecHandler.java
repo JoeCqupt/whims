@@ -9,7 +9,7 @@ import io.whim.rpc.service.invoke.RpcRequest;
 
 import java.util.List;
 
-public class RpcRequestSerializeHandler extends MessageToMessageCodec<DataPackage, RpcRequest> {
+public class RpcRequestCodecHandler extends MessageToMessageCodec<DataPackage, RpcRequest> {
 
 
     @Override

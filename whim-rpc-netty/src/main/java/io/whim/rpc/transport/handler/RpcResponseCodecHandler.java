@@ -12,7 +12,7 @@ import io.whim.rpc.service.invoke.RpcResponse;
 
 import java.util.List;
 
-public class RpcResponseSerializeHandler extends MessageToMessageCodec<DataPackage, RpcResponse> {
+public class RpcResponseCodecHandler extends MessageToMessageCodec<DataPackage, RpcResponse> {
     @Override
     protected void encode(ChannelHandlerContext ctx, RpcResponse rpcResponse, List<Object> out) throws Exception {
         String invokeId = rpcResponse.getRpcMeta().getInvokeId();

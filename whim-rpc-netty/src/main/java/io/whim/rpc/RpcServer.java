@@ -52,7 +52,7 @@ public class RpcServer {
 
         ChannelFuture future = serverBootstrap.group(boss, workers)
                 .channel(NioServerSocketChannel.class)
-                .handler(new ChannelInitializer<Channel>() {
+                .childHandler(new ChannelInitializer<Channel>() {
                     @Override
                     protected void initChannel(Channel ch) throws Exception {
                         ch.pipeline().addLast(

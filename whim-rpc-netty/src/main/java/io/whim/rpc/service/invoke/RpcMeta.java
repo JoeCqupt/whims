@@ -1,8 +1,19 @@
 package io.whim.rpc.service.invoke;
 
+import io.whim.rpc.protocol.ProtocolType;
+
 public class RpcMeta {
     private String apiKey;
-    private String invokeId;
+    private int invokeId;
+    private ProtocolType protocolType;
+
+    public ProtocolType getProtocolType() {
+        return protocolType;
+    }
+
+    public void setProtocolType(ProtocolType protocolType) {
+        this.protocolType = protocolType;
+    }
 
     public String getApiKey() {
         return apiKey;
@@ -12,11 +23,11 @@ public class RpcMeta {
         this.apiKey = apiKey;
     }
 
-    public String getInvokeId() {
+    public int getInvokeId() {
         return invokeId;
     }
 
-    public void setInvokeId(String invokeId) {
+    public void setInvokeId(int invokeId) {
         this.invokeId = invokeId;
     }
 }

@@ -64,17 +64,28 @@ public class SimpleDataPackage implements DataPackage {
         if (apiInfo == null) {
             throw new IllegalStateException("api not found! api:" + apiKey);
         }
-        Class<?> paramterType = apiInfo.getParameterType();
-        Object reuqet = serializer.deserialize(bodyData, paramterType);
+        Class<?> parameterType = apiInfo.getParameterType();
+        Object request = serializer.deserialize(bodyData, parameterType);
         RpcRequest rpcRequest = new RpcRequest();
         rpcRequest.setMeta(rpcMeta);
-        rpcRequest.setRequest(reuqet);
+        rpcRequest.setRequest(request);
         return rpcRequest;
     }
 
     @Override
     public RpcResponse deserializeResponse() {
-        return null;
+        RpcMeta rpcMeta = serializer.deserialize(headerData, RpcMeta.class);
+        String apiKey = rpcMeta.getApiKey();
+        ApiInfo apiInfo = LocalServiceManager.getApiInfo(apiKey);
+        if (apiInfo == null) {
+            throw new IllegalStateException("api not found! api:" + apiKey);
+        }
+        Class<?> returnType = apiInfo.getReturnType();
+        Object response = serializer.deserialize(bodyData, returnType);
+        RpcResponse rpcResponse = new RpcResponse();
+        rpcResponse.setRpcMeta(rpcMeta);
+        rpcResponse.setResponse(response);
+        return rpcResponse;
     }
 
     @Override
@@ -99,8 +110,22 @@ public class SimpleDataPackage implements DataPackage {
 
     @Override
     public DataPackage serialize(RpcRequest rpcRequest) {
-        // todo
-        return null;
+        RpcMeta rpcMeta = rpcRequest.getMeta();
+        byte[] headerBytes = serializer.serialize(rpcMeta);
+        this.headerSize = headerBytes.length;
+        this.headerData = headerBytes;
+
+        Object request = rpcRequest.getRequest();
+        byte[] bodyBytes = serializer.serialize(request);
+        this.bodySize = bodyBytes.length;
+        this.bodyData = bodyBytes;
+
+        this.packageSize = PROTOCOL_MASK_SIZE +
+                PACKAGE_SIZE_LENGTH +
+                HEADER_SIZE_LENGTH + headerSize +
+                BODY_SIZE_LENGTH + bodySize;
+
+        return this;
     }
 
     @Override

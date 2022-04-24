@@ -2,9 +2,10 @@ package io.whim.rpc.transport.handler;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
-import io.whim.rpc.common.RpcContextHolder;
 import io.whim.rpc.protocol.DataPackage;
-import io.whim.rpc.service.invoke.RpcContext;
+import io.whim.rpc.protocol.Protocol;
+import io.whim.rpc.protocol.ProtocolManager;
+import io.whim.rpc.protocol.ProtocolType;
 import io.whim.rpc.service.invoke.RpcRequest;
 
 import java.util.List;
@@ -14,15 +15,15 @@ public class RpcRequestCodecHandler extends MessageToMessageCodec<DataPackage, R
 
     @Override
     protected void encode(ChannelHandlerContext ctx, RpcRequest rpcRequest, List<Object> out) throws Exception {
-
+        ProtocolType protocolType = rpcRequest.getMeta().getProtocolType();
+        Protocol protocol = ProtocolManager.getProtocol(protocolType);
+        DataPackage dataPackage = protocol.writeRequestData(rpcRequest);
+        out.add(dataPackage);
     }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, DataPackage dataPackage, List<Object> out) throws Exception {
         RpcRequest rpcRequest = dataPackage.deserializeRequest();
-        String invokeId = rpcRequest.getMeta().getInvokeId();
-        RpcContext rpcContext = new RpcContext(invokeId, dataPackage.getProtocolType());
-        RpcContextHolder.addRpcContext(invokeId, rpcContext);
         out.add(rpcRequest);
     }
 

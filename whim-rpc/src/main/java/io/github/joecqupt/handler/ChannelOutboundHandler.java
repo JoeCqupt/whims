@@ -7,9 +7,9 @@ import java.net.SocketAddress;
 
 public interface ChannelOutboundHandler extends ChannelHandler {
 
-    void connect(SocketAddress address);
+    void connect(ChannelContext context, SocketAddress address);
 
-    void bind(SocketAddress address);
+    void bind(ChannelContext context, SocketAddress address);
 
     void write(ChannelContext context, Object msg);
 }

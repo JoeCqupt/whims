@@ -1,10 +1,17 @@
 package io.github.joecqupt.channel.pipeline;
 
 import io.github.joecqupt.handler.ChannelHandler;
+import io.github.joecqupt.handler.ChannelInboundHandler;
+import io.github.joecqupt.handler.ChannelOutboundHandler;
 
-import java.net.SocketAddress;
+public class DefaultChannelContext implements ChannelContext {
 
-public class DefaultChannelContext extends AbstractChannelContext  implements ChannelContext{
+    protected DefaultChannelContext prev;
+    protected DefaultChannelContext next;
+
+    protected ChannelHandler channelHandler;
+
+    protected DefaultChannelPipeline pipeline;
 
     public DefaultChannelContext(ChannelHandler channelHandler, DefaultChannelPipeline pipeline) {
         this.channelHandler = channelHandler;
@@ -12,24 +19,26 @@ public class DefaultChannelContext extends AbstractChannelContext  implements Ch
     }
 
     @Override
-    public void channelRead(ChannelContext context, Object buf) {
-
+    public ChannelPipeline pipeline() {
+        return pipeline;
     }
 
     @Override
-    public void connect(SocketAddress address) {
-
+    public void fireChannelRead(Object msg) {
+        if (next instanceof TailContext) {
+            next.channelRead(next, msg);
+        } else {
+            // 触发后续的context
+            ((ChannelInboundHandler) next.channelHandler).channelRead(next, msg);
+        }
     }
 
     @Override
-    public void bind(SocketAddress address) {
-
+    public void write(Object msg) {
+        if (prev instanceof HeadContext) {
+            prev.write(prev, msg);
+        } else {
+            ((ChannelOutboundHandler) prev.channelHandler).write(prev, msg);
+        }
     }
-
-    @Override
-    public void write(ChannelContext context, Object msg) {
-
-    }
-
-
 }

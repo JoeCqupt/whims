@@ -1,6 +1,6 @@
-package io.github.joecqupt.register;
+package io.whim.rpc.registry;
 
-import io.github.joecqupt.register.endpoints.EndPointsRegistry;
+import io.whim.rpc.registry.endpoints.EndPointsRegistry;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

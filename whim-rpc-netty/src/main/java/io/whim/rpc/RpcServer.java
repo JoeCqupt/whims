@@ -45,7 +45,6 @@ public class RpcServer {
         NioEventLoopGroup workers = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors());
 
         // handlers
-        RpcCodecHandler codecHandler = new RpcCodecHandler();
         RpcRequestCodecHandler requestCodecHandler = new RpcRequestCodecHandler();
         RpcResponseCodecHandler responseCodecHandler = new RpcResponseCodecHandler();
         RpcServerHandler serverHandler = new RpcServerHandler();
@@ -56,7 +55,7 @@ public class RpcServer {
                     @Override
                     protected void initChannel(Channel ch) throws Exception {
                         ch.pipeline().addLast(
-                                codecHandler, requestCodecHandler, responseCodecHandler, serverHandler
+                                new RpcCodecHandler(), requestCodecHandler, responseCodecHandler, serverHandler
                         );
                     }
                 }).bind(port).sync();

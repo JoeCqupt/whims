@@ -20,7 +20,7 @@ public class RpcProxy implements InvocationHandler {
 
     private Registry registry;
 
-    private static long defaultTimeOut = 1000; // 1000ms
+    private static long defaultTimeOut = 100000; // 1000ms
 
     public RpcProxy(Registry registry) {
         this.registry = registry;
@@ -48,11 +48,10 @@ public class RpcProxy implements InvocationHandler {
             rpcMeta.setInvokeId(invokeId);
             rpcRequest.setMeta(rpcMeta);
             rpcRequest.setRequest(args[0]);
-            ChannelFuture channelFuture = channel.writeAndFlush(rpcRequest).sync();
+            ChannelFuture channelFuture = channel.pipeline().writeAndFlush(rpcRequest).sync();
             if (channelFuture.isSuccess()) {
-                InvokeStore.recordRequest(invokeId);
-                RpcResponse rpcResponse = InvokeStore.getResult(invokeId, defaultTimeOut);
-                return rpcResponse.getResponse();
+                RpcFuture future = RpcFutureStore.buildFuture(invokeId, method.getReturnType());
+                return future.result(defaultTimeOut);
             } else {
                 // channel write fail
                 throw channelFuture.cause();

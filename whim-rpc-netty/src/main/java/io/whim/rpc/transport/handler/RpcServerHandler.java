@@ -1,5 +1,6 @@
 package io.whim.rpc.transport.handler;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.whim.rpc.service.LocalServiceManager;
@@ -10,6 +11,7 @@ import io.whim.rpc.service.invoke.RpcResponse;
 
 import java.lang.reflect.Method;
 
+@ChannelHandler.Sharable
 public class RpcServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
@@ -26,7 +28,7 @@ public class RpcServerHandler extends ChannelInboundHandlerAdapter {
         rpcResponse.setRpcMeta(meta);
         rpcResponse.setResponse(result);
 
-        ctx.write(rpcResponse);
+        ctx.writeAndFlush(rpcResponse);
     }
 
     @Override

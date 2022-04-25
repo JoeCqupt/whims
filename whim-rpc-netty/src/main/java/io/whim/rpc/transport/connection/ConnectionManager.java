@@ -4,6 +4,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.whim.rpc.registry.ServiceInstance;
@@ -19,7 +20,6 @@ public class ConnectionManager {
 
     private static Map<ServiceInstance, Channel> channelMap = new HashMap<>();
 
-    private static RpcCodecHandler codecHandler = new RpcCodecHandler();
     private static RpcRequestCodecHandler requestCodecHandler = new RpcRequestCodecHandler();
     private static RpcResponseCodecHandler responseCodecHandler = new RpcResponseCodecHandler();
     private static RpcClientHandler clientHandler = new RpcClientHandler();
@@ -34,12 +34,13 @@ public class ConnectionManager {
             Bootstrap bootstrap = new Bootstrap();
             ChannelFuture future = bootstrap
                     .group(group)
+                    .option(ChannelOption.TCP_NODELAY, true)
                     .channel(NioSocketChannel.class)
                     .handler(new ChannelInitializer<Channel>() {
                         @Override
                         protected void initChannel(Channel ch) throws Exception {
                             ch.pipeline().addLast(
-                                    codecHandler, responseCodecHandler, requestCodecHandler, clientHandler
+                                    new RpcCodecHandler(), responseCodecHandler, requestCodecHandler, clientHandler
                             );
                         }
                     })

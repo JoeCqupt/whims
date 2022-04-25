@@ -8,6 +8,7 @@ import io.whim.rpc.serialize.Serializer;
 import io.whim.rpc.serialize.SerializerManager;
 import io.whim.rpc.service.LocalServiceManager;
 import io.whim.rpc.service.api.ApiInfo;
+import io.whim.rpc.service.invoke.RpcFutureStore;
 import io.whim.rpc.service.invoke.RpcMeta;
 import io.whim.rpc.service.invoke.RpcRequest;
 import io.whim.rpc.service.invoke.RpcResponse;
@@ -75,12 +76,8 @@ public class SimpleDataPackage implements DataPackage {
     @Override
     public RpcResponse deserializeResponse() {
         RpcMeta rpcMeta = serializer.deserialize(headerData, RpcMeta.class);
-        String apiKey = rpcMeta.getApiKey();
-        ApiInfo apiInfo = LocalServiceManager.getApiInfo(apiKey);
-        if (apiInfo == null) {
-            throw new IllegalStateException("api not found! api:" + apiKey);
-        }
-        Class<?> returnType = apiInfo.getReturnType();
+        int invokeId = rpcMeta.getInvokeId();
+        Class<?> returnType = RpcFutureStore.getReturnType(invokeId);;
         Object response = serializer.deserialize(bodyData, returnType);
         RpcResponse rpcResponse = new RpcResponse();
         rpcResponse.setRpcMeta(rpcMeta);

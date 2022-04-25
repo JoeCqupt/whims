@@ -20,8 +20,5 @@ public class Server {
                 .registerConfig(config)
                 .export(EchoService.class, echoService)
                 .start();
-
-
-
     }
 }

@@ -1,5 +1,6 @@
 package io.whim.rpc.transport.handler;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
 import io.whim.rpc.protocol.DataPackage;
@@ -10,6 +11,7 @@ import io.whim.rpc.service.invoke.RpcResponse;
 
 import java.util.List;
 
+@ChannelHandler.Sharable
 public class RpcResponseCodecHandler extends MessageToMessageCodec<DataPackage, RpcResponse> {
     @Override
     protected void encode(ChannelHandlerContext ctx, RpcResponse rpcResponse, List<Object> out) throws Exception {

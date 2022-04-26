@@ -45,6 +45,7 @@ public class RpcCodecHandler extends ByteToMessageCodec<DataPackage> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        // todo
+        LOGGER.warn("[RpcCodecHandler] ex", cause);
+        ctx.fireExceptionCaught(cause);
     }
 }

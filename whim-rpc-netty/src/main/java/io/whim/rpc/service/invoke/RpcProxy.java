@@ -48,6 +48,7 @@ public class RpcProxy implements InvocationHandler {
             rpcMeta.setInvokeId(invokeId);
             rpcRequest.setMeta(rpcMeta);
             rpcRequest.setRequest(args[0]);
+            // 同步获取write的结果
             ChannelFuture channelFuture = channel.pipeline().writeAndFlush(rpcRequest).sync();
             if (channelFuture.isSuccess()) {
                 RpcFuture future = RpcFutureStore.buildFuture(invokeId, method.getReturnType());

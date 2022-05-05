@@ -6,4 +6,7 @@ public interface EchoService {
 
     @RpcMethod
     String echo(String str);
+
+    @RpcMethod
+    int test(String msg);
 }

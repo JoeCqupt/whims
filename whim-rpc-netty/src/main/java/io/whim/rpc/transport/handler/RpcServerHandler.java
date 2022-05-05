@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 
-import static io.whim.rpc.common.Constants.RPC_META_ATTRIBUTE_KEY;
+import static io.whim.rpc.common.Constants.*;
 
 @ChannelHandler.Sharable
 public class RpcServerHandler extends ChannelInboundHandlerAdapter {
@@ -35,6 +35,7 @@ public class RpcServerHandler extends ChannelInboundHandlerAdapter {
 
         RpcRequest rpcRequest = (RpcRequest) msg;
         RpcMeta meta = rpcRequest.getMeta();
+        meta.setStatus(STATUS_SUCCESS);
         String apiKey = meta.getApiKey();
         ApiInfo apiInfo = LocalServiceManager.getApiInfo(apiKey);
         Method method = apiInfo.getMethod();
@@ -52,14 +53,14 @@ public class RpcServerHandler extends ChannelInboundHandlerAdapter {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         LOGGER.warn("[RpcServerHandler] ex", cause);
 
-
         boolean b = ctx.channel().hasAttr(RPC_META_ATTRIBUTE_KEY);
         if (b) {
             Attribute<RpcMeta> attr = ctx.channel().attr(RPC_META_ATTRIBUTE_KEY);
             RpcResponse rpcResponse = new RpcResponse();
-            rpcResponse.setRpcMeta(attr.get());
-            // todo
-            rpcResponse.setResponse(cause);
+            RpcMeta rpcMeta = attr.get();
+            rpcMeta.setStatus(STATUS_FAIL);
+            rpcResponse.setRpcMeta(rpcMeta);
+            rpcResponse.setResponse(cause.getCause().toString());
             ctx.writeAndFlush(rpcResponse).addListener(LOGGING_LISTENER);
         } else {
             ctx.fireExceptionCaught(cause);

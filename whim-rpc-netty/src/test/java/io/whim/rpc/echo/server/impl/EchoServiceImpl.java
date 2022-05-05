@@ -7,4 +7,9 @@ public class EchoServiceImpl implements EchoService {
     public String echo(String str) {
         return str;
     }
+
+    @Override
+    public int test(String msg) {
+        throw new RuntimeException("app runtime ex");
+    }
 }

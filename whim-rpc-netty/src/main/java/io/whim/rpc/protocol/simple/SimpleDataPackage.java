@@ -13,6 +13,7 @@ import io.whim.rpc.service.invoke.RpcMeta;
 import io.whim.rpc.service.invoke.RpcRequest;
 import io.whim.rpc.service.invoke.RpcResponse;
 
+import static io.whim.rpc.common.Constants.STATUS_SUCCESS;
 import static io.whim.rpc.protocol.Protocol.PROTOCOL_MASK_SIZE;
 
 
@@ -77,8 +78,13 @@ public class SimpleDataPackage implements DataPackage {
     public RpcResponse deserializeResponse() {
         RpcMeta rpcMeta = serializer.deserialize(headerData, RpcMeta.class);
         int invokeId = rpcMeta.getInvokeId();
-        Class<?> returnType = RpcFutureStore.getReturnType(invokeId);;
-        Object response = serializer.deserialize(bodyData, returnType);
+        Object response = null;
+        if (rpcMeta.getStatus() == STATUS_SUCCESS) {
+            Class<?> returnType = RpcFutureStore.getReturnType(invokeId);
+            response = serializer.deserialize(bodyData, returnType);
+        } else {
+            response = serializer.deserialize(bodyData, String.class);
+        }
         RpcResponse rpcResponse = new RpcResponse();
         rpcResponse.setRpcMeta(rpcMeta);
         rpcResponse.setResponse(response);

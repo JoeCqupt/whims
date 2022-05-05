@@ -10,7 +10,7 @@ import io.whim.rpc.service.invoke.RpcResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static io.whim.rpc.common.Constants.RPC_META_ATTRIBUTE_KEY;
+import static io.whim.rpc.common.Constants.*;
 
 @ChannelHandler.Sharable
 public class RpcClientHandler extends ChannelInboundHandlerAdapter {
@@ -28,17 +28,6 @@ public class RpcClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         LOGGER.warn("[RpcClientHandler] ex", cause);
-
-        boolean b = ctx.channel().hasAttr(RPC_META_ATTRIBUTE_KEY);
-        if (b) {
-            Attribute<RpcMeta> attr = ctx.channel().attr(RPC_META_ATTRIBUTE_KEY);
-            RpcResponse rpcResponse = new RpcResponse();
-            rpcResponse.setRpcMeta(attr.get());
-            // todo
-            rpcResponse.setResponse(cause);
-            RpcFutureStore.callback(rpcResponse);
-        } else {
-            ctx.fireExceptionCaught(cause);
-        }
+        ctx.fireExceptionCaught(cause);
     }
 }

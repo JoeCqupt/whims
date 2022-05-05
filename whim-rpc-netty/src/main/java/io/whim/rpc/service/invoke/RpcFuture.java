@@ -8,6 +8,7 @@ public class RpcFuture {
 
     private Class<?> returnType;
     private Object res;
+    private Exception ex;
 
     private CountDownLatch countDown;
 
@@ -25,9 +26,15 @@ public class RpcFuture {
         this.countDown.countDown();
     }
 
-    public Object result(long timeout) throws InterruptedException, TimeoutException {
+    public void callback(Exception e) {
+        this.ex = e;
+        this.countDown.countDown();
+    }
+
+    public Object result(long timeout) throws Exception {
         boolean done = countDown.await(timeout, TimeUnit.MILLISECONDS);
         if (done) {
+            if (ex != null) throw ex;
             return res;
         } else {
             throw new TimeoutException("invoke timeout");

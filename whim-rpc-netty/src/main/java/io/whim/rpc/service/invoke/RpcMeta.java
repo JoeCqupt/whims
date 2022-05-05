@@ -6,6 +6,10 @@ public class RpcMeta {
     private String apiKey;
     private int invokeId;
     private ProtocolType protocolType;
+    /**
+     * 请求状态
+     */
+    private byte status;
 
     public ProtocolType getProtocolType() {
         return protocolType;
@@ -29,5 +33,13 @@ public class RpcMeta {
 
     public void setInvokeId(int invokeId) {
         this.invokeId = invokeId;
+    }
+
+    public byte getStatus() {
+        return status;
+    }
+
+    public void setStatus(byte status) {
+        this.status = status;
     }
 }

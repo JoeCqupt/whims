@@ -22,6 +22,8 @@ public class RpcProxy implements InvocationHandler {
 
     private static long defaultTimeOut = 100000; // 1000ms
 
+    private static ProtocolType defaultProtocolType = ProtocolType.SIMPLE;
+
     public RpcProxy(Registry registry) {
         this.registry = registry;
     }
@@ -38,24 +40,28 @@ public class RpcProxy implements InvocationHandler {
             }
             InstanceChooser chooser = InstanceChoosers.random();
             ServiceInstance instance = chooser.choose(serviceInstanceList);
-            Channel channel = ConnectionManager.getChannel(instance);
+            // 现在没有连接池，只能对这个连接进行全局加锁
+            synchronized (ConnectionManager.class) {
+                // TODO 连接池
+                Channel channel = ConnectionManager.getChannel(instance);
 
-            RpcRequest rpcRequest = new RpcRequest();
-            RpcMeta rpcMeta = new RpcMeta();
-            rpcMeta.setProtocolType(ProtocolType.SIMPLE);
-            rpcMeta.setApiKey(apiKey);
-            int invokeId = Utils.genInvokeId();
-            rpcMeta.setInvokeId(invokeId);
-            rpcRequest.setMeta(rpcMeta);
-            rpcRequest.setRequest(args[0]);
-            // 同步获取write的结果
-            ChannelFuture channelFuture = channel.pipeline().writeAndFlush(rpcRequest).sync();
-            if (channelFuture.isSuccess()) {
-                RpcFuture future = RpcFutureStore.buildFuture(invokeId, method.getReturnType());
-                return future.result(defaultTimeOut);
-            } else {
-                // channel write fail
-                throw channelFuture.cause();
+                RpcRequest rpcRequest = new RpcRequest();
+                RpcMeta rpcMeta = new RpcMeta();
+                rpcMeta.setProtocolType(defaultProtocolType);
+                rpcMeta.setApiKey(apiKey);
+                int invokeId = Utils.genInvokeId();
+                rpcMeta.setInvokeId(invokeId);
+                rpcRequest.setMeta(rpcMeta);
+                rpcRequest.setRequest(args[0]);
+                // 同步获取write的结果
+                ChannelFuture channelFuture = channel.pipeline().writeAndFlush(rpcRequest).sync();
+                if (channelFuture.isSuccess()) {
+                    RpcFuture future = RpcFutureStore.buildFuture(invokeId, method.getReturnType());
+                    return future.result(defaultTimeOut);
+                } else {
+                    // channel write fail
+                    throw channelFuture.cause();
+                }
             }
         } else {
             return method.invoke(proxy, args);

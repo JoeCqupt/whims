@@ -9,8 +9,9 @@ public interface Constants {
     String COLON = ":";
 
 
-    int STATUS_SUCCESS = 1;
-    int STATUS_FAIL = 0;
+    byte STATUS_SUCCESS = 1;
+    byte STATUS_FAIL = 0;
+
 
 
     String RPC_META = "RPC_META";

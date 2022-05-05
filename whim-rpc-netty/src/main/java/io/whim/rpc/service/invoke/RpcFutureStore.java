@@ -1,7 +1,11 @@
 package io.whim.rpc.service.invoke;
 
+import io.whim.rpc.exception.RemoteInvokeException;
+
 import java.util.HashMap;
 import java.util.Map;
+
+import static io.whim.rpc.common.Constants.STATUS_SUCCESS;
 
 public class RpcFutureStore {
 
@@ -19,12 +23,19 @@ public class RpcFutureStore {
     }
 
     public static void callback(RpcResponse response) {
-        int invokeId = response.getRpcMeta().getInvokeId();
+        RpcMeta rpcMeta = response.getRpcMeta();
+        int invokeId = rpcMeta.getInvokeId();
         if (!invokeMap.containsKey(invokeId)) {
             throw new IllegalStateException("invoke not exist, invokeId:" + invokeId);
         }
         RpcFuture future = invokeMap.get(invokeId);
-        future.callback(response.getResponse());
+        byte status = rpcMeta.getStatus();
+        if (status != STATUS_SUCCESS) {
+            Exception e = new RemoteInvokeException((String) response.getResponse());
+            future.callback(e);
+        } else {
+            future.callback(response.getResponse());
+        }
         invokeMap.remove(invokeId);
     }
 

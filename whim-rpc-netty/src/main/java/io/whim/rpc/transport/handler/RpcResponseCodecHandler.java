@@ -34,11 +34,6 @@ public class RpcResponseCodecHandler extends MessageToMessageCodec<DataPackage, 
     protected void decode(ChannelHandlerContext ctx, DataPackage dataPackage, List<Object> out) throws Exception {
         LOGGER.debug("[RpcResponseCodecHandler] decode invoke");
         RpcResponse rpcResponse = dataPackage.deserializeResponse();
-
-        // 设置attr
-        Attribute<RpcMeta> attr = ctx.channel().attr(RPC_META_ATTRIBUTE_KEY);
-        attr.set(rpcResponse.getRpcMeta());
-
         out.add(rpcResponse);
     }
 

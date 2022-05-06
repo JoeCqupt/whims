@@ -3,19 +3,16 @@ package io.whim.rpc.transport.handler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
-import io.netty.util.Attribute;
 import io.whim.rpc.protocol.DataPackage;
 import io.whim.rpc.protocol.Protocol;
 import io.whim.rpc.protocol.ProtocolManager;
 import io.whim.rpc.protocol.ProtocolType;
-import io.whim.rpc.service.invoke.RpcMeta;
 import io.whim.rpc.service.invoke.RpcResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static io.whim.rpc.common.Constants.RPC_META_ATTRIBUTE_KEY;
 
 @ChannelHandler.Sharable
 public class RpcResponseCodecHandler extends MessageToMessageCodec<DataPackage, RpcResponse> {

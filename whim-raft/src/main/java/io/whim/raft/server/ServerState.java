@@ -4,21 +4,29 @@ package io.whim.raft.server;
 public class ServerState {
     private RaftServer.Role role;
     private long currentTerm = 0;
-    private int votedFor = -1;
+    private String leaderId;
 
-    public synchronized long getTerm() {
-        return currentTerm;
+    public ServerState(RaftServer.Role role) {
+        this.role = role;
     }
 
-    public synchronized <T extends RaftServer.Role> T setRole(T newRole) {
+
+    public RaftServer.Role changeRole(RaftServer.Role newRole) {
+        assert role != newRole;
         role = newRole;
         return newRole;
     }
 
-    public synchronized long initElection(int id) {
-        votedFor = id;
+    public synchronized long initElection(String id) {
+        assert isFollower() || isCandidate();
+        leaderId = id;
         return ++currentTerm;
     }
+
+    public synchronized long getCurrentTerm() {
+        return currentTerm;
+    }
+
 
     public synchronized boolean isFollower() {
         return role instanceof RaftServer.Follower;
@@ -32,8 +40,9 @@ public class ServerState {
         return role instanceof RaftServer.Leader;
     }
 
-    public synchronized RaftServer.Role getRole(){
+    public synchronized RaftServer.Role getRole() {
         return role;
     }
+
 
 }

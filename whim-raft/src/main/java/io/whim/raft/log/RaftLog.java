@@ -4,6 +4,11 @@ import java.util.List;
 
 public class RaftLog {
 
+    public long getNextIndex() {
+        // todo
+        return 0;
+    }
+
     public static class TermIndex implements Comparable<TermIndex> {
         final long term;
         final long logIndex;
@@ -20,7 +25,7 @@ public class RaftLog {
         }
     }
 
-    public abstract static  class Entry extends TermIndex {
+    public abstract static class Entry extends TermIndex {
 
         public Entry(long term, long logIndex) {
             super(term, logIndex);

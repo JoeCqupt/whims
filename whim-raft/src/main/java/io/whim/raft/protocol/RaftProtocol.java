@@ -13,9 +13,9 @@ public interface RaftProtocol {
     class Response {
         final boolean success;
         final long term;
-        final int id;
+        final String id;
 
-        public Response(boolean success, long term, int id) {
+        public Response(boolean success, long term, String id) {
             this.success = success;
             this.term = term;
             this.id = id;
@@ -34,12 +34,13 @@ public interface RaftProtocol {
     /**
      * vote request
      */
-    Response requestVote(int candidateId, long term, RaftLog.TermIndex lastCommited) throws IOException;
+    Response requestVote(String candidateId, long candidateTerm,
+                         RaftLog.TermIndex candidateLastEntry) throws IOException;
 
     /**
      * append entry
      */
-    Response appendEntries(int leaderId, long term, RaftLog.TermIndex previous,
+    Response appendEntries(String leaderId, long term, RaftLog.TermIndex previous,
                            long leaderCommit, RaftLog.Entry... entries) throws IOException;
 
 }

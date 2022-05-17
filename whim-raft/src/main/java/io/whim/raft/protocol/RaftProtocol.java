@@ -21,13 +21,21 @@ public interface RaftProtocol {
             this.id = id;
         }
 
+        public boolean success() {
+            return success;
+        }
+
+        public long term() {
+            return term;
+        }
+
+        public String id() {
+            return id;
+        }
+
         @Override
         public String toString() {
             return "s" + id + "-t" + term + ":" + success;
-        }
-
-        public boolean isSuccess() {
-            return success;
         }
     }
 

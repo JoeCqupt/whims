@@ -1,5 +1,6 @@
 package io.whim.raft.server;
 
+import com.google.common.base.Preconditions;
 import io.whim.raft.common.RaftConstants;
 import io.whim.raft.log.RaftLog;
 import io.whim.raft.protocol.RaftProtocol;
@@ -8,11 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class RaftServer implements RaftProtocol {
@@ -28,43 +26,7 @@ public class RaftServer implements RaftProtocol {
 
 
     class Leader extends Role {
-        class FollowerInfo {
-            class RpcSender extends Thread {
-                @Override
-                public String toString() {
-                    return getClass().getSimpleName() + server.id;
-                }
 
-                @Override
-                public void run() {
-                    try {
-                        checkAndSendAppendEntries();
-                    } catch (InterruptedException | InterruptedIOException e) {
-                        LOG.info(id + ": " + this + " is interrupted.", e);
-                    }
-                }
-
-                private void checkAndSendAppendEntries()
-                        throws InterruptedException, InterruptedIOException {
-                    // todo
-                }
-            }
-
-            private final RaftServer server;
-            private final AtomicLong lastRpcTime;
-            private long nextIndex;
-            private final AtomicLong matchIndex = new AtomicLong();
-            private final Thread rpcSender;
-
-            public FollowerInfo(RaftServer server, long lastRpcTime, long nextIndex) {
-                this.server = server;
-                this.lastRpcTime = new AtomicLong(lastRpcTime);
-                this.nextIndex = nextIndex;
-                this.rpcSender = new RpcSender();
-            }
-
-
-        }
 
         private final List<FollowerInfo> followers = new ArrayList<>(ensemable.size());
 
@@ -89,7 +51,126 @@ public class RaftServer implements RaftProtocol {
             }
         }
 
+        private void checkResponseTerm(long term) {
+            synchronized (state) {
+                if (term > state.getCurrentTerm()) {
+                    changeToFollower();
+                }
+            }
+        }
 
+        private void updateLastCommitted() {
+            // 把所有follower的matchIndex放进去
+            final long[] indices = new long[followers.size() + 1];
+            for (int i = 0; i < followers.size(); i++) {
+                indices[i] = followers.get(i).matchIndex.get();
+            }
+            // 把leader的最后日志index加入
+            indices[followers.size()] = raftLog.getNextIndex() - 1;
+
+            Arrays.sort(indices);
+
+            // 半数以上确认之后就可以commit了
+            raftLog.setLastCommitted(indices[(indices.length - 1) / 2]);
+        }
+
+        class FollowerInfo {
+            private final RaftServer server;
+            private final AtomicLong lastRpcTime;
+            private long nextIndex;
+            private final AtomicLong matchIndex = new AtomicLong(-1);
+            private final Thread rpcSender;
+
+            public FollowerInfo(RaftServer server, long lastRpcTime, long nextIndex) {
+                this.server = server;
+                this.lastRpcTime = new AtomicLong(lastRpcTime);
+                this.nextIndex = nextIndex;
+                this.rpcSender = new RpcSender();
+            }
+
+            private boolean shouldSend() {
+                return raftLog.get(nextIndex) != null || getHeartbeatRemainingTime() <= 0;
+            }
+
+            private long getHeartbeatRemainingTime() {
+                // 选择最小超时的一半 当作心跳时间
+                return (lastRpcTime.get() + RaftConstants.RPC_TIMEOUT_MIN_MS / 2) - System.currentTimeMillis();
+            }
+
+            private void checkAndSendAppendEntries()
+                    throws InterruptedException, InterruptedIOException {
+                for (; ; ) {
+                    if (shouldSend()) {
+                        Response r = sendAppendEntriesWithRetries();
+                        lastRpcTime.set(System.currentTimeMillis());
+                        checkResponseTerm(r.term());
+                        if (!r.success()) {
+                            nextIndex--; // may implements the optimization in Section 5.3
+                        }
+                    }
+
+                    synchronized (this) {
+                        wait(getHeartbeatRemainingTime());
+                    }
+                }
+            }
+
+            private Response sendAppendEntriesWithRetries()
+                    throws InterruptedException, InterruptedIOException {
+                RaftLog.Entry[] entries = null;
+                for (int retry = 0; ; retry++) {
+                    try {
+                        if (entries == null) {
+                            entries = raftLog.getEntries(nextIndex);
+                        }
+                        final RaftLog.TermIndex previous = raftLog.get(nextIndex - 1);
+                        // 响应中断
+                        if (Thread.interrupted()) {
+                            throw new InterruptedIOException();
+                        }
+                        final Response r = server.appendEntries(id, state.getCurrentTerm(),
+                                previous, raftLog.getLastCommitted().getIndex(), entries);
+                        if (r.success()) {
+                            if (entries != null || entries.length > 0) {
+                                final long mi = entries[entries.length - 1].getIndex();
+                                updateMatchIndex(mi);
+                                nextIndex = mi + 1;
+                            }
+                        }
+                        return r;
+                    } catch (InterruptedIOException iioe) {
+                        throw iioe;
+                    } catch (IOException ioe) {
+                        // 这个表示可重试的错误
+                        LOG.warn(id + ": Failed to send appendEntries to " + server
+                                + "; retry " + retry, ioe);
+                    }
+
+                    TimeUnit.MILLISECONDS.sleep(RaftConstants.RPC_SLEEP_TIME_MS);
+                }
+            }
+
+            private void updateMatchIndex(long mi) {
+                matchIndex.set(mi);
+                updateLastCommitted();
+            }
+
+            class RpcSender extends Thread {
+                @Override
+                public String toString() {
+                    return getClass().getSimpleName() + server.id;
+                }
+
+                @Override
+                public void run() {
+                    try {
+                        checkAndSendAppendEntries();
+                    } catch (InterruptedException | InterruptedIOException e) {
+                        LOG.info(id + ": " + this + " is interrupted.", e);
+                    }
+                }
+            }
+        }
     }
 
     class Follower extends Role {
@@ -106,6 +187,7 @@ public class RaftServer implements RaftProtocol {
             for (; ; ) {
                 final long electionTerm = state.initElection(id);
 
+                // 选举结果
                 final LeaderElection.Result r = new LeaderElection(
                         RaftServer.this, electionTerm).begin();
 
@@ -113,7 +195,6 @@ public class RaftServer implements RaftProtocol {
                     if (electionTerm != state.getCurrentTerm() || !state.isCandidate()) {
                         return; // term already passed or no longer a candidate.
                     }
-
                     switch (r) {
                         case ELECTED:
                             changeToLeader();
@@ -140,7 +221,7 @@ public class RaftServer implements RaftProtocol {
     }
 
     private void changeToLeader() {
-        assert state.isCandidate();
+        Preconditions.checkState(state.isCandidate());
         changeRole(new Leader()).startRpcSenders();
     }
 

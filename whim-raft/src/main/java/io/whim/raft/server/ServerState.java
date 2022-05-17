@@ -1,6 +1,8 @@
 package io.whim.raft.server;
 
 
+import com.google.common.base.Preconditions;
+
 public class ServerState {
     private RaftServer.Role role;
     private long currentTerm = 0;
@@ -11,14 +13,14 @@ public class ServerState {
     }
 
 
-    public RaftServer.Role changeRole(RaftServer.Role newRole) {
-        assert role != newRole;
+    public synchronized RaftServer.Role changeRole(RaftServer.Role newRole) {
+        Preconditions.checkState(role != newRole);
         role = newRole;
         return newRole;
     }
 
     public synchronized long initElection(String id) {
-        assert isFollower() || isCandidate();
+        Preconditions.checkState(isFollower() || isCandidate());
         leaderId = id;
         return ++currentTerm;
     }

@@ -11,6 +11,8 @@ public class RaftLog {
     private long lastCommitted = -1;
 
 
+
+
     public static class TermIndex implements Comparable<TermIndex> {
         final long term;
         final long logIndex;
@@ -87,6 +89,12 @@ public class RaftLog {
     }
 
     public TermIndex getLastCommitted() {
+        return null;
+    }
+
+    public TermIndex getLastEntry() {
+        // todo
+
         return null;
     }
 

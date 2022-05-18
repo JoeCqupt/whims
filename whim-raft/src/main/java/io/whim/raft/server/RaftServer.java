@@ -2,6 +2,7 @@ package io.whim.raft.server;
 
 import com.google.common.base.Preconditions;
 import io.whim.raft.common.RaftConstants;
+import io.whim.raft.exception.RaftServerException;
 import io.whim.raft.log.RaftLog;
 import io.whim.raft.protocol.RaftProtocol;
 import org.slf4j.Logger;
@@ -297,6 +298,33 @@ public class RaftServer implements RaftProtocol {
     public void init(List<RaftServer> otherServers) {
         ensemable.setOtherServers(otherServers);
         monitor.start();
+    }
+
+    public Ensemable getEnsemable() {
+        return ensemable;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public ServerState getState() {
+        return state;
+    }
+
+    public RaftLog getRaftLog() {
+        return raftLog;
+    }
+
+
+    public Response sendRequestVote(long electionTerm, RaftServer s) throws RaftServerException {
+        while (true) {
+            try {
+                return s.requestVote(id, electionTerm, raftLog.getLastEntry());
+            } catch (IOException e) {
+                throw new RaftServerException(s.id, e);
+            }
+        }
     }
 
     @Override

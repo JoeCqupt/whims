@@ -137,7 +137,7 @@ public class RaftServer implements RaftProtocol {
                         final Response r = server.appendEntries(id, state.getCurrentTerm(),
                                 previous, raftLog.getLastCommitted().getIndex(), entries);
                         if (r.success()) {
-                            if (entries != null || entries.length > 0) {
+                            if (entries != null && entries.length > 0) {
                                 final long mi = entries[entries.length - 1].getIndex();
                                 updateMatchIndex(mi);
                                 nextIndex = mi + 1;
@@ -321,17 +321,17 @@ public class RaftServer implements RaftProtocol {
 
     @Override
     public Response requestVote(String candidateId, long candidateTerm,
-                                RaftLog.TermIndex candidateLastEntry) throws IOException {
+                                RaftLog.Entry candidateLastEntry) throws IOException {
         LOG.trace("{}: receive requestVote({}, {}, {})",
                 id, candidateId, candidateTerm, candidateLastEntry);
-        final long now = System.currentTimeMillis();
+        final long startTime = System.currentTimeMillis();
         boolean voteGranted = false;
         synchronized (state) {
             if (state.recognizeCandidate(candidateId, candidateTerm)) {
                 changeToFollower();
-                monitor.updateLastRpcTime(now);
+                monitor.updateLastRpcTime(startTime);
                 if (candidateLastEntry == null
-                        || raftLog.getLastCommitted().compareTo(candidateLastEntry) <= 0) { // fixme为什么是lastcommitted
+                        || raftLog.getLastCommitted().compareTo(candidateLastEntry) <= 0) { // fixme: 为什么是lastcommitted
                     voteGranted = state.vote(candidateId, candidateTerm);
                 }
             }
@@ -341,10 +341,40 @@ public class RaftServer implements RaftProtocol {
     }
 
     @Override
-    public Response appendEntries(String leaderId, long term, RaftLog.TermIndex previous,
+    public Response appendEntries(String leaderId, long leaderTerm, RaftLog.TermIndex previous,
                                   long leaderCommit, RaftLog.Entry... entries) throws IOException {
-        return null;
+
+        LOG.trace("{}: receive appendEntries({}, {}, {}, {}, {})",
+                id, leaderId, leaderTerm, previous, leaderCommit,
+                entries == null || entries.length == 0 ? "[]"
+                        : entries.length + " entries start with " + entries[0]);
+
+        final long startTime = System.currentTimeMillis();
+        RaftLog.Entry.checkEntries(leaderTerm, entries);
+
+        final long currentTerm;
+
+        synchronized (state) {
+            final boolean recognized = state.recognizeLeader(leaderId, leaderTerm);
+            currentTerm = state.getCurrentTerm();
+            if (!recognized) {
+                return new Response(false, currentTerm, id);
+            }
+            changeToFollower();
+            Preconditions.checkState(currentTerm == leaderTerm);
+            monitor.updateLastRpcTime(startTime);
+            if (previous != null && !raftLog.contains(previous)) {
+                return new Response(false, currentTerm, id);
+            }
+            raftLog.apply(entries);
+            return new Response(true, currentTerm, id);
+        }
     }
 
+
+    @Override
+    public String toString() {
+        return id + ":" + state + ":" + raftLog;
+    }
 
 }

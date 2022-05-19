@@ -43,12 +43,12 @@ public interface RaftProtocol {
      * vote request
      */
     Response requestVote(String candidateId, long candidateTerm,
-                         RaftLog.TermIndex candidateLastEntry) throws IOException;
+                         RaftLog.Entry candidateLastEntry) throws IOException;
 
     /**
      * append entry
      */
-    Response appendEntries(String leaderId, long term, RaftLog.TermIndex previous,
+    Response appendEntries(String leaderId, long leaderTerm, RaftLog.TermIndex previous,
                            long leaderCommit, RaftLog.Entry... entries) throws IOException;
 
 }

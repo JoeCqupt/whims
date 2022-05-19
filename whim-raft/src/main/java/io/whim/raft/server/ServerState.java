@@ -57,7 +57,7 @@ public class ServerState {
         }
     }
 
-    public boolean vote(String candidateId, long candidateTerm) {
+    public synchronized boolean vote(String candidateId, long candidateTerm) {
         Preconditions.checkState(isFollower());
 
         boolean voteGranted = true;
@@ -75,5 +75,27 @@ public class ServerState {
             leaderId = candidateId;
         }
         return voteGranted;
+    }
+
+    public synchronized boolean recognizeLeader(String leaderId, long leaderTerm) {
+        if (leaderTerm < currentTerm) {
+            return false;
+        } else if (leaderTerm > currentTerm) {
+            this.currentTerm = leaderTerm;
+            this.leaderId = leaderId;
+            return true;
+        }
+
+        // leaderTerm == currentTerm
+        if (leaderId == null || !isLeader()) {
+            this.leaderId = leaderId;
+        }
+
+        return this.leaderId == leaderId;
+    }
+
+    @Override
+    public String toString() {
+        return getRole().getClass().getSimpleName() + "-t" + currentTerm + "-leader=" + leaderId;
     }
 }

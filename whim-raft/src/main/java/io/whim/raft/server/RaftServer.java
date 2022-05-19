@@ -10,7 +10,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -304,19 +309,6 @@ public class RaftServer implements RaftProtocol {
         return ensemable;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public ServerState getState() {
-        return state;
-    }
-
-    public RaftLog getRaftLog() {
-        return raftLog;
-    }
-
-
     public Response sendRequestVote(long electionTerm, RaftServer s) throws RaftServerException {
         while (true) {
             try {
@@ -330,7 +322,22 @@ public class RaftServer implements RaftProtocol {
     @Override
     public Response requestVote(String candidateId, long candidateTerm,
                                 RaftLog.TermIndex candidateLastEntry) throws IOException {
-        return null;
+        LOG.trace("{}: receive requestVote({}, {}, {})",
+                id, candidateId, candidateTerm, candidateLastEntry);
+        final long now = System.currentTimeMillis();
+        boolean voteGranted = false;
+        synchronized (state) {
+            if (state.recognizeCandidate(candidateId, candidateTerm)) {
+                changeToFollower();
+                monitor.updateLastRpcTime(now);
+                if (candidateLastEntry == null
+                        || raftLog.getLastCommitted().compareTo(candidateLastEntry) <= 0) { // fixme为什么是lastcommitted
+                    voteGranted = state.vote(candidateId, candidateTerm);
+                }
+            }
+            return new Response(voteGranted, state.getCurrentTerm(), id);
+        }
+
     }
 
     @Override

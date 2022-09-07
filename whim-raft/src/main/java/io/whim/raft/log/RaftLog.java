@@ -1,82 +1,14 @@
 package io.whim.raft.log;
 
 import com.google.common.base.Preconditions;
+import io.whim.raft.server.Entry;
+import io.whim.raft.server.TermIndex;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class RaftLog {
-
-
-    public static class TermIndex implements Comparable<TermIndex> {
-        final long term;
-        final long index;
-
-        public TermIndex(long term, long logIndex) {
-            this.term = term;
-            this.index = logIndex;
-        }
-
-        public long getTerm() {
-            return term;
-        }
-
-        public long getIndex() {
-            return index;
-        }
-
-        @Override
-        public int compareTo(TermIndex that) {
-            final int diff = Long.compare(this.term, that.term);
-            return diff != 0 ? diff : Long.compare(this.index, that.index);
-        }
-
-        static boolean equal(TermIndex a, TermIndex b) {
-            return a == b || (a != null && b != null && a.compareTo(b) == 0);
-        }
-
-        private static String toString(long n) {
-            return n < 0 ? "~" : "" + n;
-        }
-
-        @Override
-        public String toString() {
-            return "t" + toString(term) + "i" + toString(index);
-        }
-
-    }
-
-    public interface Message {
-    }
-
-    public static class Entry extends TermIndex {
-        private final Message message;
-        public static final Entry[] EMPTY_ARRAY = {};
-
-        public Entry(long term, long logIndex, Message message) {
-            super(term, logIndex);
-            this.message = message;
-        }
-
-        public static void checkEntries(long leaderTerm, Entry... entries) {
-            if (entries != null && entries.length > 0) {
-                final long index0 = entries[0].getIndex();
-                for (int i = 0; i < entries.length; i++) {
-                    final long term = entries[i].getTerm();
-                    Preconditions.checkArgument(leaderTerm >= term,
-                            "Unexpected Term: entries[{}].getTerm()={} but leaderTerm={}",
-                            i, term, leaderTerm);
-
-                    final long indexI = entries[i].getIndex();
-                    Preconditions.checkArgument(indexI == index0 + i, "Unexpected Index: "
-                                    + "entries[{}].getIndex()={} but entries[0].getIndex()={}",
-                            i, indexI, index0);
-                }
-            }
-        }
-
-    }
 
 
     private final List<Entry> entries = new ArrayList<>();

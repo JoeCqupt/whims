@@ -2,24 +2,19 @@ package io.github.joecqupt.channel.pipeline;
 
 import io.github.joecqupt.channel.RpcChannel;
 import io.github.joecqupt.handler.ChannelHandler;
-import io.github.joecqupt.handler.ChannelInboundHandler;
-import io.github.joecqupt.handler.ChannelOutboundHandler;
 
 import java.net.SocketAddress;
 
-public class DefaultChannelPipeline implements ChannelPipeline, ChannelInboundInvoker, ChannelOutboundInvoker {
+public class DefaultChannelPipeline implements ChannelPipeline {
     private RpcChannel channel;
-
-    private static ChannelHandler HEAD_HANDLER = new HeadChannelHandler();
-    private static ChannelHandler TAIL_HANDLER = new TailChannelHandler();
 
     protected DefaultChannelContext head;
     protected DefaultChannelContext tail;
 
 
     public DefaultChannelPipeline(RpcChannel channel) {
-        head = new DefaultChannelContext(HEAD_HANDLER, this);
-        tail = new DefaultChannelContext(TAIL_HANDLER, this);
+        head = new HeadContext(this);
+        tail = new TailContext(this);
         head.next = tail;
         tail.prev = head;
         this.channel = channel;
@@ -47,89 +42,107 @@ public class DefaultChannelPipeline implements ChannelPipeline, ChannelInboundIn
         tail.prev = newCtx;
     }
 
-    @Override
-    public void channelRead(ChannelContext context, Object buf) {
 
+    @Override
+    public void fireChannelRead(Object msg) {
+        head.fireChannelRead(msg);
+    }
+
+    @Override
+    public void fireExceptionCaught(Throwable t) {
+        head.fireExceptionCaught(t);
     }
 
     @Override
     public void connect(SocketAddress address) {
-
+        tail.connect(address);
     }
 
     @Override
     public void bind(SocketAddress address) {
-
-    }
-
-    @Override
-    public void write(ChannelContext context, Object msg) {
-
+        tail.bind(address);
     }
 
     @Override
     public void write(Object msg) {
-        tail.write(tail, msg);
+        tail.write(msg);
     }
 
-    @Override
-    public void fireChannelRead(Object msg) {
-        // 从头开始触发
-        head.channelRead(head, msg);
+    /**
+     * TODO
+     */
+    static class HeadContext extends DefaultChannelContext {
+
+        public HeadContext(DefaultChannelPipeline pipeline) {
+            super(null, pipeline);
+        }
+
+        @Override
+        public ChannelPipeline pipeline() {
+            return null;
+        }
+
+        @Override
+        public void fireChannelRead(Object msg) {
+
+        }
+
+        @Override
+        public void fireExceptionCaught(Throwable t) {
+
+        }
+
+        @Override
+        public void connect(SocketAddress address) {
+
+        }
+
+        @Override
+        public void bind(SocketAddress address) {
+
+        }
+
+        @Override
+        public void write(Object msg) {
+
+        }
     }
 
-    static class HeadChannelHandler implements ChannelInboundHandler, ChannelOutboundHandler, ChannelHandler {
+    /**
+     * TODO
+     */
+    static class TailContext extends DefaultChannelContext {
+        public TailContext(DefaultChannelPipeline pipeline) {
+            super(null, pipeline);
+        }
 
         @Override
-        public void exceptionCaught(ChannelContext ctx, Throwable t) {
+        public ChannelPipeline pipeline() {
+            return null;
+        }
+
+        @Override
+        public void fireChannelRead(Object msg) {
 
         }
 
         @Override
-        public void channelRead(ChannelContext context, Object buf) {
+        public void fireExceptionCaught(Throwable t) {
 
         }
 
         @Override
-        public void connect(ChannelContext context, SocketAddress address) {
+        public void connect(SocketAddress address) {
 
         }
 
         @Override
-        public void bind(ChannelContext context, SocketAddress address) {
+        public void bind(SocketAddress address) {
 
         }
 
         @Override
-        public void write(ChannelContext context, Object msg) {
-
-        }
-    }
-
-    static class TailChannelHandler implements ChannelInboundHandler, ChannelOutboundHandler, ChannelHandler {
-
-        @Override
-        public void exceptionCaught(ChannelContext ctx, Throwable t) {
-
-        }
-
-        @Override
-        public void channelRead(ChannelContext context, Object buf) {
-
-        }
-
-        @Override
-        public void connect(ChannelContext context, SocketAddress address) {
-
-        }
-
-        @Override
-        public void bind(ChannelContext context, SocketAddress address) {
-
-        }
-
-        @Override
-        public void write(ChannelContext context, Object msg) {
+        public void write(Object msg) {
 
         }
     }

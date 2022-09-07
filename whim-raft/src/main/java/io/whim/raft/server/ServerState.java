@@ -2,100 +2,44 @@ package io.whim.raft.server;
 
 
 import com.google.common.base.Preconditions;
+import io.whim.raft.log.RaftLog;
 
 public class ServerState {
-    private RaftServer.Role role;
-    private long currentTerm = 0;
+
+    private final String selfId;
+    /**
+     * Latest term server has seen. initialized to 0 on first boot, increases
+     * monotonically.
+     */
+    private long currentTerm;
+    /**
+     * The server ID of the leader for this term. Null means either there is
+     * no leader for this term yet or this server does not know who it is yet.
+     */
     private String leaderId;
+    /**
+     * Candidate that received this peer's grantVote in current term (or null if none).
+     */
+    private String votedFor;
+    /**
+     * Raft log
+     */
+    private final RaftLog log;
+    /**
+     * Index of highest log entry applied to state machine
+     */
+    private long lastApplied;
 
-    public ServerState(RaftServer.Role role) {
-        this.role = role;
+    public ServerState(String id) {
+        this.selfId = id;
+        // TODO load log/currentTerm/votedFor/leaderId from persistent storage
+        log = new RaftLog();
+        currentTerm = 0;
+        votedFor = null;
+        leaderId = null;
     }
 
-
-    public synchronized RaftServer.Role changeRole(RaftServer.Role newRole) {
-        Preconditions.checkState(role != newRole);
-        role = newRole;
-        return newRole;
-    }
-
-    public synchronized long initElection(String id) {
-        Preconditions.checkState(isFollower() || isCandidate());
-        leaderId = id;
-        return ++currentTerm;
-    }
-
-    public synchronized long getCurrentTerm() {
-        return currentTerm;
-    }
-
-
-    public synchronized boolean isFollower() {
-        return role instanceof RaftServer.Follower;
-    }
-
-    public synchronized boolean isCandidate() {
-        return role instanceof RaftServer.Candidate;
-    }
-
-    public synchronized boolean isLeader() {
-        return role instanceof RaftServer.Leader;
-    }
-
-    public synchronized RaftServer.Role getRole() {
-        return role;
-    }
-
-
-    public synchronized boolean recognizeCandidate(String candidateId, long candidateTerm) {
-        if (candidateTerm < currentTerm) {
-            return false;
-        } else if (candidateTerm == currentTerm && !isFollower()) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    public synchronized boolean vote(String candidateId, long candidateTerm) {
-        Preconditions.checkState(isFollower());
-
-        boolean voteGranted = true;
-        if (currentTerm > candidateTerm) {
-            voteGranted = false;
-        } else if (currentTerm < candidateTerm) {
-            currentTerm = candidateTerm;
-        } else {
-            if (leaderId != null && leaderId != candidateId) {
-                voteGranted = false;
-            }
-        }
-
-        if (voteGranted) {
-            leaderId = candidateId;
-        }
-        return voteGranted;
-    }
-
-    public synchronized boolean recognizeLeader(String leaderId, long leaderTerm) {
-        if (leaderTerm < currentTerm) {
-            return false;
-        } else if (leaderTerm > currentTerm) {
-            this.currentTerm = leaderTerm;
-            this.leaderId = leaderId;
-            return true;
-        }
-
-        // leaderTerm == currentTerm
-        if (leaderId == null || !isLeader()) {
-            this.leaderId = leaderId;
-        }
-
-        return this.leaderId == leaderId;
-    }
-
-    @Override
-    public String toString() {
-        return getRole().getClass().getSimpleName() + "-t" + currentTerm + "-leader=" + leaderId;
+    public RaftLog getLog() {
+        return log;
     }
 }

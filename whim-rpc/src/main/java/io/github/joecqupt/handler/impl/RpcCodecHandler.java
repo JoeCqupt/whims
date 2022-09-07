@@ -10,14 +10,14 @@ import java.nio.ByteBuffer;
 
 import static io.github.joecqupt.protocol.Protocol.MASK_SIZE;
 
-public class RpcCodecHandler implements ChannelAdapterHandler {
+public class RpcCodecHandler extends ChannelAdapterHandler {
 
 
     private ByteBuffer bufferCollector = null;
 
 
     @Override
-    public void channelRead(ChannelContext context, Object buf) {
+    public void channelRead(ChannelContext ctx, Object buf) {
         // 根据自定义协议格式，解析数据包
         ByteBuffer buffer = (ByteBuffer) buf;
         try {
@@ -55,26 +55,16 @@ public class RpcCodecHandler implements ChannelAdapterHandler {
                 bufferCollector.put(oldBufferCollector.array(), oldBufferCollector.position(), oldBufferCollector.limit());
             }
             // 让后续处理这个数据包
-            context.fireChannelRead(dataPackage);
+            ctx.fireChannelRead(dataPackage);
         } catch (NotEnoughException nee) {
             // ignore
         }
     }
 
     @Override
-    public void connect(SocketAddress address) {
-
-    }
-
-    @Override
-    public void bind(SocketAddress address) {
-
-    }
-
-    @Override
-    public void write(ChannelContext context, Object msg) {
+    public void write(ChannelContext ctx, Object msg) {
         DataPackage dataPackage = (DataPackage) msg;
         ByteBuffer byteBuffer = dataPackage.toByteBuffer();
-        context.write(byteBuffer);
+        ctx.write(byteBuffer);
     }
 }

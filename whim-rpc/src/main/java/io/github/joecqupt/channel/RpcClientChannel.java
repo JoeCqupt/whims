@@ -1,6 +1,6 @@
 package io.github.joecqupt.channel;
 
-import io.github.joecqupt.channel.pipeline.ChannelPipeline;
+import io.github.joecqupt.channel.pipeline.DefaultChannelPipeline;
 import io.github.joecqupt.eventloop.EventLoop;
 import io.github.joecqupt.exception.RpcException;
 import org.slf4j.Logger;
@@ -29,10 +29,9 @@ public class RpcClientChannel extends AbstractRpcChannel implements RpcChannel {
     private SelectionKey key;
     private static final Logger LOG = LoggerFactory.getLogger(RpcClientChannel.class);
 
-    public RpcClientChannel(SocketChannel socketChannel, ChannelPipeline pipeline) {
+    public RpcClientChannel(SocketChannel socketChannel) {
         this.socketChannel = socketChannel;
-        this.pipeline = pipeline;
-        pipeline.setChannel(this);
+        this.pipeline = new DefaultChannelPipeline(this);
     }
 
     @Override

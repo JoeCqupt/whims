@@ -12,22 +12,22 @@ public abstract class ChannelAdapterHandler implements ChannelInboundHandler, Ch
     }
 
     @Override
-    public void channelRead(ChannelContext context, Object buf) {
-        context.fireChannelRead(buf);
+    public void channelRead(ChannelContext ctx, Object buf) {
+        ctx.fireChannelRead(buf);
     }
 
     @Override
-    public void connect(ChannelContext context, SocketAddress address) {
-        context.connect(address);
+    public void connect(ChannelContext ctx, SocketAddress address) {
+        ctx.connect(address);
     }
 
     @Override
-    public void bind(ChannelContext context, SocketAddress address) {
-        context.bind(address);
+    public void bind(ChannelContext ctx, SocketAddress address) {
+        ctx.bind(address);
     }
 
     @Override
-    public void write(ChannelContext context, Object msg) {
-        context.write(msg);
+    public void write(ChannelContext ctx, Object msg) {
+        ctx.write(msg);
     }
 }

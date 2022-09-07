@@ -2,7 +2,7 @@ package io.whim.raft.server;
 
 import io.whim.raft.common.RaftConstants;
 import io.whim.raft.exception.RaftException;
-import io.whim.raft.protocol.RaftProtocol;
+import io.whim.raft.server.protocol.RaftProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,10 +17,10 @@ public class LeaderElection {
     enum Result {ELECTED, REJECTED, TIMEOUT, NEWTERM}
 
 
-    private final RaftServer candidate;
+    private final RaftServer2 candidate;
     private final long electionTerm;
 
-    public LeaderElection(RaftServer candidate, long electionTerm) {
+    public LeaderElection(RaftServer2 candidate, long electionTerm) {
         this.candidate = candidate;
         this.electionTerm = electionTerm;
     }
@@ -87,8 +87,8 @@ public class LeaderElection {
     private int submitRequestVoteTasks(ExecutorCompletionService<RaftProtocol.Response> completion)
             throws InterruptedException, RaftException {
         int submitted = 0;
-        Collection<RaftServer> otherServers = candidate.getEnsemable().getOtherServers();
-        for (RaftServer s : otherServers) {
+        Collection<RaftServer2> otherServers = candidate.getEnsemable().getOtherServers();
+        for (RaftServer2 s : otherServers) {
             submitted++;
             completion.submit(new Callable<RaftProtocol.Response>() {
                 @Override

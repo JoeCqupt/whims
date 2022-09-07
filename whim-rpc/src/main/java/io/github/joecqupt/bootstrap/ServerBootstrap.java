@@ -2,8 +2,6 @@ package io.github.joecqupt.bootstrap;
 
 import io.github.joecqupt.channel.RpcChannel;
 import io.github.joecqupt.channel.RpcServerChannel;
-import io.github.joecqupt.channel.pipeline.ChannelPipeline;
-import io.github.joecqupt.channel.pipeline.DefaultChannelPipeline;
 import io.github.joecqupt.eventloop.EventLoopGroup;
 import io.github.joecqupt.handler.impl.RpcCodecHandler;
 import io.github.joecqupt.handler.impl.RpcServerHandler;
@@ -80,10 +78,9 @@ public class ServerBootstrap {
                                 socketChannel.configureBlocking(false);
                                 LOG.debug("accept a new connection:{}", socketChannel.getRemoteAddress());
                                 // init pipe
-                                ChannelPipeline pipeline = new DefaultChannelPipeline();
-                                pipeline.addLast(new RpcCodecHandler());
-                                pipeline.addLast(new RpcServerHandler());
-                                RpcChannel rpcChannel = new RpcServerChannel(socketChannel, pipeline);
+                                RpcChannel rpcChannel = new RpcServerChannel(socketChannel);
+                                rpcChannel.pipeline().addLast(new RpcCodecHandler());
+                                rpcChannel.pipeline().addLast(new RpcServerHandler());
                                 eventLoopGroup.register(rpcChannel);
                             }
                             iterator.remove();

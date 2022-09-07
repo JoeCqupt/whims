@@ -12,31 +12,22 @@ import io.github.joecqupt.serialization.RpcResponse;
 
 import java.net.SocketAddress;
 
-public class RpcClientHandler implements ChannelAdapterHandler {
+public class RpcClientHandler extends ChannelAdapterHandler {
     @Override
-    public void channelRead(ChannelContext context, Object buf) {
+    public void channelRead(ChannelContext ctx, Object buf) {
         DataPackage dataPackage = (DataPackage) buf;
         RpcResponse rpcResponse = dataPackage.deserializeResponse();
         FutureStore.notifyFuture(rpcResponse.getRpcMeta().getInvokeId(), rpcResponse.getResponse());
     }
 
-    @Override
-    public void connect(SocketAddress address) {
-
-    }
 
     @Override
-    public void bind(SocketAddress address) {
-
-    }
-
-    @Override
-    public void write(ChannelContext context, Object msg) {
+    public void write(ChannelContext ctx, Object msg) {
         // RpcRequest to DataPackage
         RpcRequest rpcRequest = (RpcRequest) msg;
         ProtocolType protocolType = rpcRequest.getRpcMeta().getProtocolType();
         Protocol protocol = ProtocolManger.getProtocol(protocolType);
         DataPackage dataPackage = protocol.writeRequestData(rpcRequest);
-        context.write(dataPackage);
+        ctx.write(dataPackage);
     }
 }

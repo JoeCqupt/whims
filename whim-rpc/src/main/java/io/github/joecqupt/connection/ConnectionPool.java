@@ -24,10 +24,9 @@ public class ConnectionPool {
                 socketChannel.configureBlocking(false);
                 socketChannel.connect(new InetSocketAddress(instance.getIp(), instance.getPort()));
 
-                ChannelPipeline pipeline = new DefaultChannelPipeline();
-                pipeline.addLast(new RpcCodecHandler());
-                pipeline.addLast(new RpcClientHandler());
-                rpcClientChannel = new RpcClientChannel(socketChannel, pipeline);
+                rpcClientChannel = new RpcClientChannel(socketChannel);
+                rpcClientChannel.pipeline().addLast(new RpcCodecHandler());
+                rpcClientChannel.pipeline().addLast(new RpcClientHandler());
                 pool.put(instance, rpcClientChannel);
                 return rpcClientChannel;
             } catch (Exception e) {

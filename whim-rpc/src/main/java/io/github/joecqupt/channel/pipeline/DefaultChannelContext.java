@@ -4,11 +4,12 @@ import io.github.joecqupt.handler.ChannelHandler;
 import io.github.joecqupt.handler.ChannelInboundHandler;
 import io.github.joecqupt.handler.ChannelOutboundHandler;
 
+import java.net.SocketAddress;
+
 public class DefaultChannelContext implements ChannelContext {
 
     protected DefaultChannelContext prev;
     protected DefaultChannelContext next;
-
     protected ChannelHandler channelHandler;
 
     protected DefaultChannelPipeline pipeline;
@@ -25,20 +26,27 @@ public class DefaultChannelContext implements ChannelContext {
 
     @Override
     public void fireChannelRead(Object msg) {
-        if (next instanceof TailContext) {
-            next.channelRead(next, msg);
-        } else {
-            // 触发后续的context
-            ((ChannelInboundHandler) next.channelHandler).channelRead(next, msg);
-        }
+        ((ChannelInboundHandler) next.channelHandler).channelRead(this, msg);
+    }
+
+    @Override
+    public void fireExceptionCaught(Throwable t) {
+        next.channelHandler.exceptionCaught(this, t);
+    }
+
+    @Override
+    public void connect(SocketAddress address) {
+        ((ChannelOutboundHandler) next.channelHandler).connect(this, address);
+    }
+
+    @Override
+    public void bind(SocketAddress address) {
+        ((ChannelOutboundHandler) next.channelHandler).bind(this, address);
     }
 
     @Override
     public void write(Object msg) {
-        if (prev instanceof HeadContext) {
-            prev.write(prev, msg);
-        } else {
-            ((ChannelOutboundHandler) prev.channelHandler).write(prev, msg);
-        }
+        ((ChannelOutboundHandler) next.channelHandler).write(this, msg);
     }
+
 }

@@ -1,7 +1,7 @@
 package io.github.joecqupt.channel;
 
 
-import io.github.joecqupt.channel.pipeline.ChannelPipeline;
+import io.github.joecqupt.channel.pipeline.DefaultChannelPipeline;
 import io.github.joecqupt.eventloop.EventLoop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +29,9 @@ public class RpcServerChannel extends AbstractRpcChannel implements RpcChannel {
      */
     private static int defaultReadBufferSize = 512;
 
-    public RpcServerChannel(SocketChannel socketChannel, ChannelPipeline pipeline) {
+    public RpcServerChannel(SocketChannel socketChannel) {
         this.socketChannel = socketChannel;
-        this.pipeline = pipeline;
-        pipeline.setChannel(this);
+        this.pipeline = new DefaultChannelPipeline(this);
     }
 
     @Override

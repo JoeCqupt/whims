@@ -68,9 +68,6 @@ public class DefaultChannelPipeline implements ChannelPipeline {
         tail.write(msg);
     }
 
-    /**
-     * TODO
-     */
     static class HeadContext extends DefaultChannelContext {
 
         public HeadContext(DefaultChannelPipeline pipeline) {
@@ -82,35 +79,14 @@ public class DefaultChannelPipeline implements ChannelPipeline {
             return null;
         }
 
-        @Override
-        public void fireChannelRead(Object msg) {
-
-        }
 
         @Override
         public void fireExceptionCaught(Throwable t) {
-
-        }
-
-        @Override
-        public void connect(SocketAddress address) {
-
-        }
-
-        @Override
-        public void bind(SocketAddress address) {
-
-        }
-
-        @Override
-        public void write(Object msg) {
-
+            // TODO @joecqupt
         }
     }
 
-    /**
-     * TODO
-     */
+
     static class TailContext extends DefaultChannelContext {
         public TailContext(DefaultChannelPipeline pipeline) {
             super(null, pipeline);
@@ -121,29 +97,11 @@ public class DefaultChannelPipeline implements ChannelPipeline {
             return null;
         }
 
-        @Override
-        public void fireChannelRead(Object msg) {
-
-        }
 
         @Override
         public void fireExceptionCaught(Throwable t) {
-
+            // TODO @joecqupt
         }
 
-        @Override
-        public void connect(SocketAddress address) {
-
-        }
-
-        @Override
-        public void bind(SocketAddress address) {
-
-        }
-
-        @Override
-        public void write(Object msg) {
-
-        }
     }
 }

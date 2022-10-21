@@ -26,27 +26,47 @@ public class DefaultChannelContext implements ChannelContext {
 
     @Override
     public void fireChannelRead(Object msg) {
-        ((ChannelInboundHandler) next.channelHandler).channelRead(this, msg);
+        try {
+            ((ChannelInboundHandler) next.channelHandler).channelRead(this, msg);
+        } catch (Exception e) {
+            next.channelHandler.exceptionCaught(this, e);
+        }
     }
 
     @Override
     public void fireExceptionCaught(Throwable t) {
-        next.channelHandler.exceptionCaught(this, t);
+        if (channelHandler instanceof ChannelInboundHandler) {
+            next.channelHandler.exceptionCaught(this, t);
+        } else {
+            prev.channelHandler.exceptionCaught(this, t);
+        }
     }
 
     @Override
     public void connect(SocketAddress address) {
-        ((ChannelOutboundHandler) next.channelHandler).connect(this, address);
+        try {
+            ((ChannelOutboundHandler) prev.channelHandler).connect(this, address);
+        } catch (Exception e) {
+            prev.channelHandler.exceptionCaught(this, e);
+        }
     }
 
     @Override
     public void bind(SocketAddress address) {
-        ((ChannelOutboundHandler) next.channelHandler).bind(this, address);
+        try {
+            ((ChannelOutboundHandler) prev.channelHandler).bind(this, address);
+        } catch (Exception e) {
+            prev.channelHandler.exceptionCaught(this, e);
+        }
     }
 
     @Override
     public void write(Object msg) {
-        ((ChannelOutboundHandler) next.channelHandler).write(this, msg);
+        try {
+            ((ChannelOutboundHandler) prev.channelHandler).write(this, msg);
+        } catch (Exception e) {
+            prev.channelHandler.exceptionCaught(this, e);
+        }
     }
 
 }

@@ -27,7 +27,7 @@ public class DefaultChannelContext implements ChannelContext {
     @Override
     public void fireChannelRead(Object msg) {
         try {
-            ((ChannelInboundHandler) next.channelHandler).channelRead(this, msg);
+            ((ChannelInboundHandler) next.channelHandler).channelRead(next, msg);
         } catch (Exception e) {
             next.channelHandler.exceptionCaught(this, e);
         }
@@ -35,17 +35,18 @@ public class DefaultChannelContext implements ChannelContext {
 
     @Override
     public void fireExceptionCaught(Throwable t) {
+        // FIXME @joecqupt
         if (channelHandler instanceof ChannelInboundHandler) {
-            next.channelHandler.exceptionCaught(this, t);
+            next.channelHandler.exceptionCaught(next, t);
         } else {
-            prev.channelHandler.exceptionCaught(this, t);
+            prev.channelHandler.exceptionCaught(prev, t);
         }
     }
 
     @Override
     public void connect(SocketAddress address) {
         try {
-            ((ChannelOutboundHandler) prev.channelHandler).connect(this, address);
+            ((ChannelOutboundHandler) prev.channelHandler).connect(prev, address);
         } catch (Exception e) {
             prev.channelHandler.exceptionCaught(this, e);
         }
@@ -54,7 +55,7 @@ public class DefaultChannelContext implements ChannelContext {
     @Override
     public void bind(SocketAddress address) {
         try {
-            ((ChannelOutboundHandler) prev.channelHandler).bind(this, address);
+            ((ChannelOutboundHandler) prev.channelHandler).bind(prev, address);
         } catch (Exception e) {
             prev.channelHandler.exceptionCaught(this, e);
         }
@@ -63,7 +64,11 @@ public class DefaultChannelContext implements ChannelContext {
     @Override
     public void write(Object msg) {
         try {
-            ((ChannelOutboundHandler) prev.channelHandler).write(this, msg);
+            // FIXME 
+            if (prev instanceof DefaultChannelPipeline.HeadContext) {
+                prev.write(msg);
+            }
+            ((ChannelOutboundHandler) prev.channelHandler).write(prev, msg);
         } catch (Exception e) {
             prev.channelHandler.exceptionCaught(this, e);
         }

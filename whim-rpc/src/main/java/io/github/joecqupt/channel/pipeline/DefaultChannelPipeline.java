@@ -84,6 +84,22 @@ public class DefaultChannelPipeline implements ChannelPipeline {
         public void fireExceptionCaught(Throwable t) {
             // TODO @joecqupt
         }
+
+        @Override
+        public void connect(SocketAddress address) {
+            // TODO
+        }
+
+        @Override
+        public void bind(SocketAddress address) {
+            // TODO
+        }
+
+        @Override
+        public void write(Object msg) {
+            this.pipeline.channel.write(msg);
+            this.pipeline.channel.flush();
+        }
     }
 
 
@@ -103,5 +119,9 @@ public class DefaultChannelPipeline implements ChannelPipeline {
             // TODO @joecqupt
         }
 
+        @Override
+        public void fireChannelRead(Object msg) {
+            // TODO @joecqupt logging it
+        }
     }
 }

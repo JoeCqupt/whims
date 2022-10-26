@@ -1,7 +1,7 @@
 package io.github.joecqupt.channel.pipeline;
 
 import io.github.joecqupt.channel.RpcChannel;
-import io.github.joecqupt.handler.ChannelHandler;
+import io.github.joecqupt.channel.handler.ChannelHandler;
 
 import java.net.SocketAddress;
 

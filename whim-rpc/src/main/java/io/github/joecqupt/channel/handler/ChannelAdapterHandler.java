@@ -1,6 +1,9 @@
-package io.github.joecqupt.handler;
+package io.github.joecqupt.channel.handler;
 
 
+import io.github.joecqupt.channel.handler.ChannelHandler;
+import io.github.joecqupt.channel.handler.ChannelInboundHandler;
+import io.github.joecqupt.channel.handler.ChannelOutboundHandler;
 import io.github.joecqupt.channel.pipeline.ChannelContext;
 
 import java.net.SocketAddress;

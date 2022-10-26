@@ -1,7 +1,7 @@
 package io.github.joecqupt.handler.impl;
 
 import io.github.joecqupt.channel.pipeline.ChannelContext;
-import io.github.joecqupt.handler.ChannelAdapterHandler;
+import io.github.joecqupt.channel.handler.ChannelAdapterHandler;
 import io.github.joecqupt.invoke.Invoker;
 import io.github.joecqupt.protocol.DataPackage;
 import io.github.joecqupt.protocol.Protocol;

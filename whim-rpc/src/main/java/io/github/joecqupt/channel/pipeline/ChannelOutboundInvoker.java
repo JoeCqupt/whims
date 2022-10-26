@@ -1,12 +1,14 @@
 package io.github.joecqupt.channel.pipeline;
 
+import io.github.joecqupt.channel.ChannelFuture;
+
 import java.net.SocketAddress;
 
 public interface ChannelOutboundInvoker {
 
-    void connect(SocketAddress address);
+    ChannelFuture connect(SocketAddress address);
 
-    void bind(SocketAddress address);
+    ChannelFuture bind(SocketAddress address);
 
-    void write(Object msg);
+    ChannelFuture write(Object msg);
 }

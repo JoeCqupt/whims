@@ -2,7 +2,7 @@ package io.github.joecqupt.channel.pipeline;
 
 
 import io.github.joecqupt.channel.RpcChannel;
-import io.github.joecqupt.handler.ChannelHandler;
+import io.github.joecqupt.channel.handler.ChannelHandler;
 
 public interface ChannelPipeline extends ChannelInboundInvoker, ChannelOutboundInvoker {
 

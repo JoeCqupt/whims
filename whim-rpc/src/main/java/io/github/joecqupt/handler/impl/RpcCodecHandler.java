@@ -2,10 +2,9 @@ package io.github.joecqupt.handler.impl;
 
 import io.github.joecqupt.channel.pipeline.ChannelContext;
 import io.github.joecqupt.exception.NotEnoughException;
-import io.github.joecqupt.handler.ChannelAdapterHandler;
+import io.github.joecqupt.channel.handler.ChannelAdapterHandler;
 import io.github.joecqupt.protocol.*;
 
-import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 
 import static io.github.joecqupt.protocol.Protocol.MASK_SIZE;

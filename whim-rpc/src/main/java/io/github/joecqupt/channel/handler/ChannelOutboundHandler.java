@@ -1,4 +1,4 @@
-package io.github.joecqupt.handler;
+package io.github.joecqupt.channel.handler;
 
 
 import io.github.joecqupt.channel.pipeline.ChannelContext;

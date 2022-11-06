@@ -44,8 +44,12 @@ public class Invoker {
                 Object response = method.invoke(instance, rpcRequest.getRequest());
                 RpcResponse rpcResponse = new RpcResponse(rpcMeta, response);
                 channel.pipeline().write(rpcResponse);
+                // TODO
+//                channel.pipeline().write(rpcResponse).addListener();
             } catch (Exception e) {
                 // todo build response
+                // TODO
+//                channel.pipeline().write()
             }
         }
     }

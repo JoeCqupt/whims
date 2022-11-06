@@ -1,5 +1,6 @@
 package io.github.joecqupt.handler.impl;
 
+import io.github.joecqupt.channel.ChannelPromise;
 import io.github.joecqupt.channel.pipeline.ChannelContext;
 import io.github.joecqupt.channel.handler.ChannelAdapterHandler;
 import io.github.joecqupt.invoke.FutureStore;
@@ -20,12 +21,12 @@ public class RpcClientHandler extends ChannelAdapterHandler {
 
 
     @Override
-    public void write(ChannelContext ctx, Object msg) {
+    public void write(ChannelContext context, Object msg, ChannelPromise promise) {
         // RpcRequest to DataPackage
         RpcRequest rpcRequest = (RpcRequest) msg;
         ProtocolType protocolType = rpcRequest.getRpcMeta().getProtocolType();
         Protocol protocol = ProtocolManger.getProtocol(protocolType);
         DataPackage dataPackage = protocol.writeRequestData(rpcRequest);
-        ctx.write(dataPackage);
+        context.write(dataPackage, promise);
     }
 }

@@ -55,6 +55,11 @@ public class RpcClientChannel extends AbstractRpcChannel implements RpcChannel {
     }
 
     @Override
+    public void disconnect() throws Exception{
+        close();
+    }
+
+    @Override
     public void read() {
         try {
             ByteBuffer buffer = ByteBuffer.allocate(defaultReadBufferSize);
@@ -98,5 +103,10 @@ public class RpcClientChannel extends AbstractRpcChannel implements RpcChannel {
         } catch (IOException e) {
             throw new RpcException("fail connect to remote", e);
         }
+    }
+
+    @Override
+    public void close() throws Exception {
+        socketChannel.close();
     }
 }

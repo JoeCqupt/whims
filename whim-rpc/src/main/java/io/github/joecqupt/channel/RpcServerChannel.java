@@ -56,6 +56,11 @@ public class RpcServerChannel extends AbstractRpcChannel implements RpcChannel {
     }
 
     @Override
+    public void disconnect() throws Exception {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void read() {
         try {
             ByteBuffer buffer = ByteBuffer.allocate(defaultReadBufferSize);
@@ -92,5 +97,10 @@ public class RpcServerChannel extends AbstractRpcChannel implements RpcChannel {
     @Override
     public void finishConnect() {
 
+    }
+
+    @Override
+    public void close() throws Exception {
+        socketChannel.close();;
     }
 }

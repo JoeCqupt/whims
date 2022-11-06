@@ -1,5 +1,6 @@
 package io.github.joecqupt.handler.impl;
 
+import io.github.joecqupt.channel.ChannelPromise;
 import io.github.joecqupt.channel.pipeline.ChannelContext;
 import io.github.joecqupt.channel.handler.ChannelAdapterHandler;
 import io.github.joecqupt.invoke.Invoker;
@@ -21,12 +22,12 @@ public class RpcServerHandler extends ChannelAdapterHandler {
 
 
     @Override
-    public void write(ChannelContext ctx, Object msg) {
+    public void write(ChannelContext context, Object msg, ChannelPromise promise) {
         RpcResponse rpcResponse = (RpcResponse) msg;
         RpcMeta rpcMeta = rpcResponse.getRpcMeta();
         Protocol protocol = ProtocolManger.getProtocol(rpcMeta.getProtocolType());
         DataPackage dataPackage = protocol.writeResponseData(rpcResponse);
-        ctx.write(dataPackage);
+        context.write(dataPackage, promise);
     }
 
 

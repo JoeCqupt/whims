@@ -1,36 +1,45 @@
 package io.github.joecqupt.channel.handler;
 
 
-import io.github.joecqupt.channel.handler.ChannelHandler;
-import io.github.joecqupt.channel.handler.ChannelInboundHandler;
-import io.github.joecqupt.channel.handler.ChannelOutboundHandler;
+import io.github.joecqupt.channel.ChannelPromise;
 import io.github.joecqupt.channel.pipeline.ChannelContext;
 
 import java.net.SocketAddress;
 
-public abstract class ChannelAdapterHandler implements ChannelInboundHandler, ChannelOutboundHandler, ChannelHandler {
+public abstract class ChannelAdapterHandler implements ChannelInboundHandler, ChannelOutboundHandler {
+
     @Override
-    public void exceptionCaught(ChannelContext ctx, Throwable t) {
-        ctx.fireExceptionCaught(t);
+    public void channelRead(ChannelContext context, Object buf) {
+        context.fireChannelRead(buf);
     }
 
     @Override
-    public void channelRead(ChannelContext ctx, Object buf) {
-        ctx.fireChannelRead(buf);
+    public void exceptionCaught(ChannelContext context, Throwable t) {
+        context.fireExceptionCaught(t);
     }
 
     @Override
-    public void connect(ChannelContext ctx, SocketAddress address) {
-        ctx.connect(address);
+    public void connect(ChannelContext context, SocketAddress address, ChannelPromise promise) {
+
     }
 
     @Override
-    public void bind(ChannelContext ctx, SocketAddress address) {
-        ctx.bind(address);
+    public void disconnect(ChannelContext context, ChannelPromise promise) {
+
     }
 
     @Override
-    public void write(ChannelContext ctx, Object msg) {
-        ctx.write(msg);
+    public void bind(ChannelContext context, SocketAddress address, ChannelPromise promise) {
+
+    }
+
+    @Override
+    public void write(ChannelContext context, Object msg, ChannelPromise promise) {
+
+    }
+
+    @Override
+    public void close(ChannelContext context, ChannelPromise promise) {
+
     }
 }

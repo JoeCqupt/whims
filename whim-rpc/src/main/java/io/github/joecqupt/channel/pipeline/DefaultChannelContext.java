@@ -1,5 +1,8 @@
 package io.github.joecqupt.channel.pipeline;
 
+import io.github.joecqupt.channel.ChannelFuture;
+import io.github.joecqupt.channel.DefaultChannelPromise;
+import io.github.joecqupt.channel.ChannelPromise;
 import io.github.joecqupt.channel.handler.ChannelHandler;
 import io.github.joecqupt.channel.handler.ChannelInboundHandler;
 import io.github.joecqupt.channel.handler.ChannelOutboundHandler;
@@ -25,53 +28,125 @@ public class DefaultChannelContext implements ChannelContext {
     }
 
     @Override
+    public ChannelHandler channelHandler() {
+        return channelHandler;
+    }
+
+    private ChannelContext findNextInboundContext(DefaultChannelContext cur) {
+        while (cur.next != null) {
+            DefaultChannelContext ctx = cur.next;
+            if (ctx.channelHandler() instanceof ChannelInboundHandler) {
+                return ctx;
+            }
+            cur = ctx;
+        }
+        return null;
+    }
+
+    private ChannelContext findNextOutboundContext(DefaultChannelContext cur) {
+        while (cur.prev != null) {
+            DefaultChannelContext ctx = cur.prev;
+            if (ctx.channelHandler() instanceof ChannelOutboundHandler) {
+                return ctx;
+            }
+            cur = ctx;
+        }
+        return null;
+    }
+
+    @Override
     public void fireChannelRead(Object msg) {
+        ChannelContext nextCtx = findNextInboundContext(this);
+        ChannelInboundHandler handler = (ChannelInboundHandler) nextCtx.channelHandler();
         try {
-            ((ChannelInboundHandler) next.channelHandler).channelRead(next, msg);
+            handler.channelRead(nextCtx, msg);
         } catch (Exception e) {
-            next.channelHandler.exceptionCaught(this, e);
+            handler.exceptionCaught(nextCtx, e);
         }
     }
+
 
     @Override
     public void fireExceptionCaught(Throwable t) {
-        // FIXME @joecqupt
-        if (channelHandler instanceof ChannelInboundHandler) {
-            next.channelHandler.exceptionCaught(next, t);
-        } else {
-            prev.channelHandler.exceptionCaught(prev, t);
-        }
+        ChannelContext nextCtx = findNextInboundContext(this);
+        ChannelInboundHandler handler = (ChannelInboundHandler) nextCtx.channelHandler();
+        handler.exceptionCaught(nextCtx, t);
     }
 
     @Override
-    public void connect(SocketAddress address) {
-        try {
-            ((ChannelOutboundHandler) prev.channelHandler).connect(prev, address);
-        } catch (Exception e) {
-            prev.channelHandler.exceptionCaught(this, e);
-        }
+    public ChannelFuture connect(SocketAddress address) {
+        DefaultChannelPromise promise = new DefaultChannelPromise();
+        connect(address, promise);
+        return promise;
     }
 
     @Override
-    public void bind(SocketAddress address) {
-        try {
-            ((ChannelOutboundHandler) prev.channelHandler).bind(prev, address);
-        } catch (Exception e) {
-            prev.channelHandler.exceptionCaught(this, e);
-        }
+    public ChannelFuture connect(SocketAddress address, ChannelPromise promise) {
+        ChannelContext nextCtx = findNextOutboundContext(this);
+        ChannelOutboundHandler handler = (ChannelOutboundHandler) nextCtx.channelHandler();
+        handler.connect(nextCtx, address, promise);
+        return promise;
+    }
+
+
+    @Override
+    public ChannelFuture disconnect() {
+        DefaultChannelPromise promise = new DefaultChannelPromise();
+        disconnect(promise);
+        return promise;
     }
 
     @Override
-    public void write(Object msg) {
-        try {
-            // FIXME 
-            if (prev instanceof DefaultChannelPipeline.HeadContext) {
-                prev.write(msg);
-            }
-            ((ChannelOutboundHandler) prev.channelHandler).write(prev, msg);
-        } catch (Exception e) {
-            prev.channelHandler.exceptionCaught(this, e);
-        }
+    public ChannelFuture disconnect(ChannelPromise promise) {
+        ChannelContext nextCtx = findNextOutboundContext(this);
+        ChannelOutboundHandler handler = (ChannelOutboundHandler) nextCtx.channelHandler();
+        handler.disconnect(nextCtx, promise);
+        return promise;
+    }
+
+    @Override
+    public ChannelFuture bind(SocketAddress address) {
+        DefaultChannelPromise promise = new DefaultChannelPromise();
+        bind(address, promise);
+        return promise;
+    }
+
+    @Override
+    public ChannelFuture bind(SocketAddress address, ChannelPromise promise) {
+        ChannelContext nextCtx = findNextOutboundContext(this);
+        ChannelOutboundHandler handler = (ChannelOutboundHandler) nextCtx.channelHandler();
+        handler.bind(nextCtx, address, promise);
+        return promise;
+    }
+
+    @Override
+    public ChannelFuture write(Object msg) {
+        DefaultChannelPromise promise = new DefaultChannelPromise();
+        write(msg, promise);
+        return promise;
+    }
+
+    @Override
+    public ChannelFuture write(Object msg, ChannelPromise promise) {
+        ChannelContext nextCtx = findNextOutboundContext(this);
+        ChannelOutboundHandler handler = (ChannelOutboundHandler) nextCtx.channelHandler();
+        handler.write(nextCtx, msg, promise);
+        return promise;
+    }
+
+    @Override
+    public ChannelFuture close() {
+        DefaultChannelPromise promise = new DefaultChannelPromise();
+        close(promise);
+        return promise;
+    }
+
+    @Override
+    public ChannelFuture close(ChannelPromise promise) {
+        ChannelContext nextCtx = findNextOutboundContext(this);
+        ChannelOutboundHandler handler = (ChannelOutboundHandler) nextCtx.channelHandler();
+        handler.close(nextCtx, promise);
+        return promise;
     }
 
 }

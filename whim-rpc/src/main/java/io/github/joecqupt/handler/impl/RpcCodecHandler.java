@@ -1,5 +1,6 @@
 package io.github.joecqupt.handler.impl;
 
+import io.github.joecqupt.channel.ChannelPromise;
 import io.github.joecqupt.channel.pipeline.ChannelContext;
 import io.github.joecqupt.exception.NotEnoughException;
 import io.github.joecqupt.channel.handler.ChannelAdapterHandler;
@@ -61,9 +62,9 @@ public class RpcCodecHandler extends ChannelAdapterHandler {
     }
 
     @Override
-    public void write(ChannelContext ctx, Object msg) {
+    public void write(ChannelContext context, Object msg, ChannelPromise promise) {
         DataPackage dataPackage = (DataPackage) msg;
         ByteBuffer byteBuffer = dataPackage.toByteBuffer();
-        ctx.write(byteBuffer);
+        context.write(byteBuffer, promise);
     }
 }

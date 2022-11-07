@@ -26,4 +26,5 @@ public interface ChannelOutboundInvoker {
     ChannelFuture close();
 
     ChannelFuture close(ChannelPromise promise);
+
 }

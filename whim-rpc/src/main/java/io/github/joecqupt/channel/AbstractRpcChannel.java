@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.SocketAddress;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
@@ -57,7 +58,70 @@ public abstract class AbstractRpcChannel implements RpcChannel {
     }
 
     @Override
-    public void close() throws Exception {
-        channel.close();
+    public ChannelFuture bind(SocketAddress address) {
+        DefaultChannelPromise promise = new DefaultChannelPromise();
+        this.bind(address, promise);
+        return promise;
+    }
+
+    @Override
+    public ChannelFuture bind(SocketAddress address, ChannelPromise promise) {
+        pipeline.bind(address, promise);
+        return promise;
+    }
+
+    @Override
+    public ChannelFuture connect(SocketAddress address) {
+        DefaultChannelPromise promise = new DefaultChannelPromise();
+        this.connect(address, promise);
+        return promise;
+    }
+
+    @Override
+    public ChannelFuture connect(SocketAddress address, ChannelPromise promise) {
+        pipeline.connect(address, promise);
+        return promise;
+    }
+
+
+    @Override
+    public ChannelFuture disconnect()  {
+        DefaultChannelPromise promise = new DefaultChannelPromise();
+        this.disconnect(promise);
+        return promise;
+    }
+
+    @Override
+    public  ChannelFuture disconnect(ChannelPromise promise){
+        this.close(promise);
+        return promise;
+    }
+
+    @Override
+    public ChannelFuture close() {
+        DefaultChannelPromise promise = new DefaultChannelPromise();
+        close(promise);
+        return promise;
+    }
+
+    @Override
+    public ChannelFuture close(ChannelPromise promise) {
+        pipeline.close(promise);
+    }
+
+    protected abstract class AbstractUnsafe implements Unsafe {
+
+
+        @Override
+        public void close(ChannelPromise promise) {
+            try {
+                channel.close();
+                promise.setSuccess(this);
+            } catch (IOException e) {
+                promise.setFailure(e);
+            }
+        }
+
+
     }
 }

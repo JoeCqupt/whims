@@ -1,6 +1,5 @@
 package io.github.joecqupt.channel;
 
-import io.github.joecqupt.exception.RpcException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,68 +39,86 @@ public class RpcClientChannel extends AbstractRpcChannel implements RpcChannel {
         return channel;
     }
 
-    @Override
-    public void bind(SocketAddress address) throws Exception {
-        SocketChannel channel = (SocketChannel) this.channel;
-        channel.bind(address);
-    }
 
-    @Override
-    public void connect(SocketAddress address) throws Exception {
-        SocketChannel channel = (SocketChannel) this.channel;
-        channel.connect(address);
-        key.interestOps(SelectionKey.OP_CONNECT | key.interestOps());
-    }
+//    @Override
+//    public void read() throws Exception {
+//        SocketChannel channel = (SocketChannel) this.channel;
+//        ByteBuffer buffer = ByteBuffer.allocate(defaultReadBufferSize);
+//        channel.read(buffer);
+//        LOGGER.debug("reading data...");
+//        buffer.flip();
+//        pipeline.fireChannelRead(buffer);
+//    }
 
-    @Override
-    public void disconnect() throws Exception {
-        close();
-    }
+//    @Override
+//    public void write(Object data) {
+//        writeBuffer.add((ByteBuffer) data);
+//        key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
+//    }
+//
+//    @Override
+//    public void flush() {
+//        SocketChannel channel = (SocketChannel) this.channel;
+//        for (ByteBuffer buffer : writeBuffer) {
+//            try {
+//                channel.write(buffer);
+//                LOGGER.debug("flush data ....");
+//            } catch (Exception e) {
+//                throw new RpcException("fail write data to remote", e);
+//            }
+//        }
+//        writeBuffer.clear();
+//        key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
+//    }
+//
+//    @Override
+//    public void finishConnect() throws Exception {
+//        SocketChannel channel = (SocketChannel) this.channel;
+//        boolean b = channel.finishConnect();
+//        if (b) {
+//            key.interestOps(~SelectionKey.OP_CONNECT & key.interestOps());
+//        }
+//
+//    }
 
-    @Override
-    public void read() throws Exception {
-        SocketChannel channel = (SocketChannel) this.channel;
-        ByteBuffer buffer = ByteBuffer.allocate(defaultReadBufferSize);
-        channel.read(buffer);
-        LOGGER.debug("reading data...");
-        buffer.flip();
-        pipeline.fireChannelRead(buffer);
-    }
+    class Unsafe extends AbstractUnsafe {
 
-    @Override
-    public void write(Object data) {
-        writeBuffer.add((ByteBuffer) data);
-        key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
-    }
-
-    @Override
-    public void flush() {
-        SocketChannel channel = (SocketChannel) this.channel;
-        for (ByteBuffer buffer : writeBuffer) {
+        @Override
+        public void bind(SocketAddress address, ChannelPromise promise) {
             try {
-                channel.write(buffer);
-                LOGGER.debug("flush data ....");
-            } catch (Exception e) {
-                throw new RpcException("fail write data to remote", e);
+                SocketChannel socketChannel = (SocketChannel) channel;
+                socketChannel.bind(address);
+                promise.setSuccess(true);
+            } catch (IOException e) {
+                promise.setFailure(e);
             }
         }
-        writeBuffer.clear();
-        key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
-    }
 
-    @Override
-    public void finishConnect() throws Exception {
-        SocketChannel channel = (SocketChannel) this.channel;
-        boolean b = channel.finishConnect();
-        if (b) {
-            key.interestOps(~SelectionKey.OP_CONNECT & key.interestOps());
+        @Override
+        public void connect(SocketAddress address, ChannelPromise promise) {
+            try {
+                SocketChannel socketChannel = (SocketChannel) channel;
+                socketChannel.connect(address);
+                key.interestOps(SelectionKey.OP_CONNECT | key.interestOps());
+                promise.setSuccess(true);
+            } catch (IOException e) {
+                promise.setFailure(e);
+            }
         }
 
-    }
+        @Override
+        public void disconnect(ChannelPromise promise) {
 
-    @Override
-    public void close() throws Exception {
-        SocketChannel channel = (SocketChannel) this.channel;
-        channel.close();
+        }
+
+        @Override
+        public void write(Object msg, ChannelPromise promise) {
+
+        }
+
+        @Override
+        public void read() {
+
+        }
     }
 }

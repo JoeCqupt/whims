@@ -9,7 +9,6 @@ import java.net.SocketAddress;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
 
 public class RpcServerChannel extends AbstractRpcChannel implements RpcChannel {
     private static final Logger LOG = LoggerFactory.getLogger(RpcServerChannel.class);
@@ -30,43 +29,54 @@ public class RpcServerChannel extends AbstractRpcChannel implements RpcChannel {
     }
 
 
-    @Override
-    public void bind(SocketAddress address) throws Exception {
-        ServerSocketChannel channel = (ServerSocketChannel) this.channel;
-        channel.bind(address);
-    }
+
+
 
     @Override
-    public void connect(SocketAddress address) {
-        throw new UnsupportedOperationException();
+    public RpcChannel.Unsafe unsafe() {
+        return null;
     }
 
-    @Override
-    public void disconnect() throws Exception {
-        throw new UnsupportedOperationException();
+//
+//    @Override
+//    public void read() throws Exception {
+//        ServerSocketChannel channel = (ServerSocketChannel) this.channel;
+//        SocketChannel socketChannel = channel.accept();
+//        pipeline.fireChannelRead(socketChannel);
+//    }
+
+
+    class Unsafe extends AbstractUnsafe {
+
+        @Override
+        public void bind(SocketAddress address, ChannelPromise promise) {
+            try {
+                ServerSocketChannel serverSocketChannel = (ServerSocketChannel) channel;
+                serverSocketChannel.bind(address);
+                promise.setSuccess(this);
+            } catch (IOException e) {
+                promise.setFailure(e);
+            }
+        }
+
+        @Override
+        public void connect(SocketAddress address, ChannelPromise promise) {
+            promise.setFailure(new UnsupportedOperationException());
+        }
+
+        @Override
+        public void disconnect(ChannelPromise promise) {
+            promise.setFailure(new UnsupportedOperationException());
+        }
+
+        @Override
+        public void write(Object msg, ChannelPromise promise) {
+            promise.setFailure(new UnsupportedOperationException());
+        }
+
+        @Override
+        public void read() {
+
+        }
     }
-
-    @Override
-    public void read() throws Exception {
-        ServerSocketChannel channel = (ServerSocketChannel) this.channel;
-        SocketChannel socketChannel = channel.accept();
-        pipeline.fireChannelRead(socketChannel);
-    }
-
-    @Override
-    public void write(Object data) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void flush() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void finishConnect() {
-        throw new UnsupportedOperationException();
-    }
-
-
 }

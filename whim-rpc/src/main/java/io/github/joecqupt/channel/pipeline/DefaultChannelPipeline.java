@@ -132,12 +132,7 @@ public class DefaultChannelPipeline implements ChannelPipeline {
         @Override
         public void connect(ChannelContext context, SocketAddress address, ChannelPromise promise) {
             RpcChannel channel = context.pipeline().getChannel();
-            try {
-                channel.connect(address);
-                promise.setSuccess(null);
-            } catch (Throwable t) {
-                promise.setFailure(t);
-            }
+            channel.unsafe().connect(address, promise);
         }
 
         @Override
@@ -145,7 +140,7 @@ public class DefaultChannelPipeline implements ChannelPipeline {
             RpcChannel channel = context.pipeline().getChannel();
             try {
                 channel.disconnect();
-                promise.setSuccess(null);
+                promise.setSuccess(true);
             } catch (Throwable t) {
                 promise.setFailure(t);
             }
@@ -154,12 +149,7 @@ public class DefaultChannelPipeline implements ChannelPipeline {
         @Override
         public void bind(ChannelContext context, SocketAddress address, ChannelPromise promise) {
             RpcChannel channel = context.pipeline().getChannel();
-            try {
-                channel.bind(address);
-                promise.setSuccess(null);
-            } catch (Throwable t) {
-                promise.setFailure(t);
-            }
+            channel.unsafe().bind(address, promise);
         }
 
         @Override
@@ -168,7 +158,7 @@ public class DefaultChannelPipeline implements ChannelPipeline {
             try {
                 channel.write(msg);
                 channel.flush();
-                promise.setSuccess(null);
+                promise.setSuccess(true);
             } catch (Throwable t) {
                 promise.setFailure(t);
             }
@@ -177,12 +167,7 @@ public class DefaultChannelPipeline implements ChannelPipeline {
         @Override
         public void close(ChannelContext context, ChannelPromise promise) {
             RpcChannel channel = context.pipeline().getChannel();
-            try {
-                channel.close();
-                promise.setSuccess(null);
-            } catch (Throwable t) {
-                promise.setFailure(t);
-            }
+            channel.unsafe().close(promise);
         }
     }
 

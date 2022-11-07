@@ -9,7 +9,7 @@ import java.net.SocketAddress;
 public abstract class ChannelAdapterHandler implements ChannelInboundHandler, ChannelOutboundHandler {
 
     @Override
-    public void channelRead(ChannelContext context, Object buf) {
+    public void channelRead(ChannelContext context, Object buf) throws Exception {
         context.fireChannelRead(buf);
     }
 

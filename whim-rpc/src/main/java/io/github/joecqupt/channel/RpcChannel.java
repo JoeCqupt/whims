@@ -1,31 +1,16 @@
 package io.github.joecqupt.channel;
 
+import io.github.joecqupt.channel.pipeline.ChannelOutboundInvoker;
 import io.github.joecqupt.channel.pipeline.ChannelPipeline;
 import io.github.joecqupt.eventloop.EventLoop;
 
-import java.io.IOException;
-import java.net.SocketAddress;
-import java.nio.ByteBuffer;
 
-public interface RpcChannel {
+public interface RpcChannel extends ChannelOutboundInvoker {
 
     void register(EventLoop eventLoop);
 
-    void bind(SocketAddress address);
-
-    void connect(SocketAddress address);
-
-    void disconnect()  throws Exception;
-
-    void read();
-
-    void write(Object data);
-
-    void flush();
+    void read() throws Exception;
 
     ChannelPipeline pipeline();
 
-    void finishConnect();
-
-    void close() throws Exception;
 }

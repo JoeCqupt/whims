@@ -1,58 +1,44 @@
 package io.github.joecqupt.channel;
 
 
-import io.github.joecqupt.channel.pipeline.DefaultChannelPipeline;
-import io.github.joecqupt.eventloop.EventLoop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.SocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
+import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
-import java.util.List;
 
 public class RpcServerChannel extends AbstractRpcChannel implements RpcChannel {
     private static final Logger LOG = LoggerFactory.getLogger(RpcServerChannel.class);
-    private SocketChannel socketChannel;
 
-    private List<ByteBuffer> writeBuffer = new ArrayList<>();
-
-    private SelectionKey key;
-
-    /**
-     * 每次默认读取多大的信息
-     */
-    private static int defaultReadBufferSize = 512;
-
-    public RpcServerChannel(SocketChannel socketChannel) {
-        this.socketChannel = socketChannel;
-        this.pipeline = new DefaultChannelPipeline(this);
+    public RpcServerChannel() {
+        super(newChannel(), SelectionKey.OP_ACCEPT);
     }
 
-    @Override
-    public void register(EventLoop eventLoop) {
-        Selector selector = eventLoop.getSelector();
+
+    private static SelectableChannel newChannel() {
+        ServerSocketChannel channel = null;
         try {
-            key = socketChannel.register(selector, SelectionKey.OP_READ, this);
-        } catch (ClosedChannelException e) {
+            channel = ServerSocketChannel.open();
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        return channel;
     }
 
 
     @Override
-    public void bind(SocketAddress address) {
-
+    public void bind(SocketAddress address) throws Exception {
+        ServerSocketChannel channel = (ServerSocketChannel) this.channel;
+        channel.bind(address);
     }
 
     @Override
     public void connect(SocketAddress address) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -61,46 +47,26 @@ public class RpcServerChannel extends AbstractRpcChannel implements RpcChannel {
     }
 
     @Override
-    public void read() {
-        try {
-            ByteBuffer buffer = ByteBuffer.allocate(defaultReadBufferSize);
-            socketChannel.read(buffer);
-            LOG.debug("reading data...");
-            buffer.flip();
-            pipeline.fireChannelRead(buffer);
-        } catch (IOException ioe) {
-            // todo build response
-        }
+    public void read() throws Exception {
+        ServerSocketChannel channel = (ServerSocketChannel) this.channel;
+        SocketChannel socketChannel = channel.accept();
+        pipeline.fireChannelRead(socketChannel);
     }
 
     @Override
     public void write(Object data) {
-        writeBuffer.add((ByteBuffer) data);
-
-        key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void flush() {
-        for (ByteBuffer buffer : writeBuffer) {
-            try {
-                socketChannel.write(buffer);
-            } catch (IOException e) {
-                throw new RuntimeException("fail write data to remote", e);
-            }
-        }
-        writeBuffer.clear();
-
-        key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void finishConnect() {
-
+        throw new UnsupportedOperationException();
     }
 
-    @Override
-    public void close() throws Exception {
-        socketChannel.close();;
-    }
+
 }

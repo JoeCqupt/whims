@@ -149,4 +149,19 @@ public class DefaultChannelContext implements ChannelContext {
         return promise;
     }
 
+    @Override
+    public ChannelFuture flush() {
+        DefaultChannelPromise promise = new DefaultChannelPromise();
+        flush(promise);
+        return promise;
+    }
+
+    @Override
+    public ChannelFuture flush(ChannelPromise promise) {
+        ChannelContext nextCtx = findNextOutboundContext(this);
+        ChannelOutboundHandler handler = (ChannelOutboundHandler) nextCtx.channelHandler();
+        handler.flush(nextCtx, promise);
+        return promise;
+    }
+
 }

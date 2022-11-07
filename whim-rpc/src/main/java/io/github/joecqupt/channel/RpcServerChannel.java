@@ -9,12 +9,14 @@ import java.net.SocketAddress;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 
 public class RpcServerChannel extends AbstractRpcChannel implements RpcChannel {
-    private static final Logger LOG = LoggerFactory.getLogger(RpcServerChannel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RpcServerChannel.class);
 
     public RpcServerChannel() {
         super(newChannel(), SelectionKey.OP_ACCEPT);
+        this.unsafe = new Unsafe();
     }
 
 
@@ -27,23 +29,6 @@ public class RpcServerChannel extends AbstractRpcChannel implements RpcChannel {
         }
         return channel;
     }
-
-
-
-
-
-    @Override
-    public RpcChannel.Unsafe unsafe() {
-        return null;
-    }
-
-//
-//    @Override
-//    public void read() throws Exception {
-//        ServerSocketChannel channel = (ServerSocketChannel) this.channel;
-//        SocketChannel socketChannel = channel.accept();
-//        pipeline.fireChannelRead(socketChannel);
-//    }
 
 
     class Unsafe extends AbstractUnsafe {
@@ -75,8 +60,27 @@ public class RpcServerChannel extends AbstractRpcChannel implements RpcChannel {
         }
 
         @Override
-        public void read() {
+        public void flush(ChannelPromise promise) {
+            promise.setFailure(new UnsupportedOperationException());
+        }
 
+        @Override
+        public void read() {
+            SocketChannel socketChannel = null;
+            try {
+                ServerSocketChannel serverSocketChannel = (ServerSocketChannel) channel;
+                socketChannel = serverSocketChannel.accept();
+            } catch (Exception e) {
+                LOGGER.error("Fail accept. ", e);
+                // closeOnReadError 要判斷特殊情況才能關閉通道
+                RpcServerChannel.this.close();
+            }
+            pipeline.fireChannelRead(socketChannel);
+        }
+
+        @Override
+        public void finishConnect() {
+            throw new UnsupportedOperationException();
         }
     }
 }

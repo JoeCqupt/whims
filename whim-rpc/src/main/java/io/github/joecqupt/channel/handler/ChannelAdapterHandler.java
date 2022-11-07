@@ -20,26 +20,31 @@ public abstract class ChannelAdapterHandler implements ChannelInboundHandler, Ch
 
     @Override
     public void connect(ChannelContext context, SocketAddress address, ChannelPromise promise) {
-
+        context.connect(address, promise);
     }
 
     @Override
     public void disconnect(ChannelContext context, ChannelPromise promise) {
-
+        context.disconnect(promise);
     }
 
     @Override
     public void bind(ChannelContext context, SocketAddress address, ChannelPromise promise) {
-
+        context.bind(address, promise);
     }
 
     @Override
     public void write(ChannelContext context, Object msg, ChannelPromise promise) {
-
+        context.write(msg, promise);
     }
 
     @Override
     public void close(ChannelContext context, ChannelPromise promise) {
+        context.close(promise);
+    }
 
+    @Override
+    public void flush(ChannelContext context, ChannelPromise promise) {
+        context.flush(promise);
     }
 }

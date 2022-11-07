@@ -16,9 +16,7 @@ public class RpcClientChannel extends AbstractRpcChannel implements RpcChannel {
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcClientChannel.class);
 
     private List<ByteBuffer> writeBuffer = new ArrayList<>();
-    /**
-     * 每次默认读取多大的信息
-     */
+
     private static int defaultReadBufferSize = 512;
 
     public RpcClientChannel() {
@@ -27,6 +25,7 @@ public class RpcClientChannel extends AbstractRpcChannel implements RpcChannel {
 
     public RpcClientChannel(SelectableChannel channel) {
         super(channel, SelectionKey.OP_READ);
+        this.unsafe = new Unsafe();
     }
 
     private static SelectableChannel newChannel() {
@@ -39,47 +38,6 @@ public class RpcClientChannel extends AbstractRpcChannel implements RpcChannel {
         return channel;
     }
 
-
-//    @Override
-//    public void read() throws Exception {
-//        SocketChannel channel = (SocketChannel) this.channel;
-//        ByteBuffer buffer = ByteBuffer.allocate(defaultReadBufferSize);
-//        channel.read(buffer);
-//        LOGGER.debug("reading data...");
-//        buffer.flip();
-//        pipeline.fireChannelRead(buffer);
-//    }
-
-//    @Override
-//    public void write(Object data) {
-//        writeBuffer.add((ByteBuffer) data);
-//        key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
-//    }
-//
-//    @Override
-//    public void flush() {
-//        SocketChannel channel = (SocketChannel) this.channel;
-//        for (ByteBuffer buffer : writeBuffer) {
-//            try {
-//                channel.write(buffer);
-//                LOGGER.debug("flush data ....");
-//            } catch (Exception e) {
-//                throw new RpcException("fail write data to remote", e);
-//            }
-//        }
-//        writeBuffer.clear();
-//        key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
-//    }
-//
-//    @Override
-//    public void finishConnect() throws Exception {
-//        SocketChannel channel = (SocketChannel) this.channel;
-//        boolean b = channel.finishConnect();
-//        if (b) {
-//            key.interestOps(~SelectionKey.OP_CONNECT & key.interestOps());
-//        }
-//
-//    }
 
     class Unsafe extends AbstractUnsafe {
 
@@ -108,17 +66,64 @@ public class RpcClientChannel extends AbstractRpcChannel implements RpcChannel {
 
         @Override
         public void disconnect(ChannelPromise promise) {
-
+            close(promise);
         }
 
         @Override
         public void write(Object msg, ChannelPromise promise) {
+            try {
+                writeBuffer.add((ByteBuffer) msg);
+                key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
+                promise.setSuccess(true);
+            } catch (Exception e) {
+                promise.setFailure(e);
+            }
+        }
 
+        @Override
+        public void flush(ChannelPromise promise) {
+            SocketChannel socketChannel = (SocketChannel) channel;
+            for (ByteBuffer buffer : writeBuffer) {
+                try {
+                    socketChannel.write(buffer);
+                } catch (Exception e) {
+                    LOGGER.error("Fail to write.", e);
+                    promise.setFailure(e);
+                    RpcClientChannel.this.close(promise);
+                    return;
+                }
+            }
+            writeBuffer.clear();
+            key.interestOps(key.interestOps() & ~SelectionKey.OP_WRITE);
+            promise.setSuccess(true);
         }
 
         @Override
         public void read() {
+            SocketChannel socketChannel = (SocketChannel) channel;
+            ByteBuffer buffer = null;
+            try {
+                buffer = ByteBuffer.allocate(defaultReadBufferSize);
+                socketChannel.read(buffer);
+                LOGGER.debug("reading data...");
+                buffer.flip();
+            } catch (Exception e) {
+                LOGGER.error("Fail to read. ", e);
+                RpcClientChannel.this.close();
+            }
+            pipeline.fireChannelRead(buffer);
+        }
 
+        @Override
+        public void finishConnect() {
+            try {
+                SocketChannel socketChannel = (SocketChannel) channel;
+                socketChannel.finishConnect();
+                key.interestOps(~SelectionKey.OP_CONNECT & key.interestOps());
+            } catch (Exception e) {
+                LOGGER.error("Fail to finishConnect.", e);
+                RpcClientChannel.this.close();
+            }
         }
     }
 }

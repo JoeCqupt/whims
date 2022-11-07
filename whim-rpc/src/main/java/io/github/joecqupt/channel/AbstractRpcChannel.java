@@ -20,15 +20,23 @@ public abstract class AbstractRpcChannel implements RpcChannel {
 
     protected DefaultChannelPipeline pipeline;
 
+
     protected SelectableChannel channel;
 
     protected int interestedOps;
 
     protected SelectionKey key;
 
+    protected Unsafe unsafe;
+
     @Override
     public ChannelPipeline pipeline() {
         return pipeline;
+    }
+
+    @Override
+    public Unsafe unsafe() {
+        return unsafe;
     }
 
     public AbstractRpcChannel(SelectableChannel channel, int interestedOps) {
@@ -85,14 +93,14 @@ public abstract class AbstractRpcChannel implements RpcChannel {
 
 
     @Override
-    public ChannelFuture disconnect()  {
+    public ChannelFuture disconnect() {
         DefaultChannelPromise promise = new DefaultChannelPromise();
         this.disconnect(promise);
         return promise;
     }
 
     @Override
-    public  ChannelFuture disconnect(ChannelPromise promise){
+    public ChannelFuture disconnect(ChannelPromise promise) {
         this.close(promise);
         return promise;
     }
@@ -107,6 +115,33 @@ public abstract class AbstractRpcChannel implements RpcChannel {
     @Override
     public ChannelFuture close(ChannelPromise promise) {
         pipeline.close(promise);
+        return promise;
+    }
+
+    @Override
+    public ChannelFuture write(Object msg) {
+        DefaultChannelPromise promise = new DefaultChannelPromise();
+        this.write(msg, promise);
+        return promise;
+    }
+
+    @Override
+    public ChannelFuture write(Object msg, ChannelPromise promise) {
+        pipeline.write(msg, promise);
+        return promise;
+    }
+
+    @Override
+    public ChannelFuture flush() {
+        DefaultChannelPromise promise = new DefaultChannelPromise();
+        this.flush(promise);
+        return promise;
+    }
+
+    @Override
+    public ChannelFuture flush(ChannelPromise promise) {
+        pipeline.flush(promise);
+        return promise;
     }
 
     protected abstract class AbstractUnsafe implements Unsafe {

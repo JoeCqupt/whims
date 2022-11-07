@@ -107,6 +107,16 @@ public class DefaultChannelPipeline implements ChannelPipeline {
         return tail.close(promise);
     }
 
+    @Override
+    public ChannelFuture flush() {
+        return tail.flush();
+    }
+
+    @Override
+    public ChannelFuture flush(ChannelPromise promise) {
+        return tail.flush(promise);
+    }
+
 
     static class HeadContext extends DefaultChannelContext implements ChannelInboundHandler, ChannelOutboundHandler {
 
@@ -138,12 +148,7 @@ public class DefaultChannelPipeline implements ChannelPipeline {
         @Override
         public void disconnect(ChannelContext context, ChannelPromise promise) {
             RpcChannel channel = context.pipeline().getChannel();
-            try {
-                channel.disconnect();
-                promise.setSuccess(true);
-            } catch (Throwable t) {
-                promise.setFailure(t);
-            }
+            channel.unsafe().disconnect(promise);
         }
 
         @Override
@@ -155,19 +160,19 @@ public class DefaultChannelPipeline implements ChannelPipeline {
         @Override
         public void write(ChannelContext context, Object msg, ChannelPromise promise) {
             RpcChannel channel = context.pipeline().getChannel();
-            try {
-                channel.write(msg);
-                channel.flush();
-                promise.setSuccess(true);
-            } catch (Throwable t) {
-                promise.setFailure(t);
-            }
+            channel.unsafe().write(msg, promise);
         }
 
         @Override
         public void close(ChannelContext context, ChannelPromise promise) {
             RpcChannel channel = context.pipeline().getChannel();
             channel.unsafe().close(promise);
+        }
+
+        @Override
+        public void flush(ChannelContext context, ChannelPromise promise) {
+            RpcChannel channel = context.pipeline().getChannel();
+            channel.unsafe().flush(promise);
         }
     }
 

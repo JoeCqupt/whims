@@ -18,4 +18,6 @@ public interface ChannelOutboundHandler extends ChannelHandler {
     void write(ChannelContext context, Object msg, ChannelPromise promise);
 
     void close(ChannelContext context, ChannelPromise promise);
+
+    void flush(ChannelContext context, ChannelPromise promise);
 }

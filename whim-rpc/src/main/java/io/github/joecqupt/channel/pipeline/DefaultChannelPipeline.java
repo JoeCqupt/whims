@@ -68,16 +68,6 @@ public class DefaultChannelPipeline implements ChannelPipeline {
     }
 
     @Override
-    public ChannelFuture disconnect() {
-        return tail.disconnect();
-    }
-
-    @Override
-    public ChannelFuture disconnect(ChannelPromise promise) {
-        return tail.disconnect(promise);
-    }
-
-    @Override
     public ChannelFuture bind(SocketAddress address) {
         return tail.bind(address);
     }
@@ -143,12 +133,6 @@ public class DefaultChannelPipeline implements ChannelPipeline {
         public void connect(ChannelContext context, SocketAddress address, ChannelPromise promise) {
             RpcChannel channel = context.pipeline().getChannel();
             channel.unsafe().connect(address, promise);
-        }
-
-        @Override
-        public void disconnect(ChannelContext context, ChannelPromise promise) {
-            RpcChannel channel = context.pipeline().getChannel();
-            channel.unsafe().disconnect(promise);
         }
 
         @Override

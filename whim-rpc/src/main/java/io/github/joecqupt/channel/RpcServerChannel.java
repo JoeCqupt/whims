@@ -50,11 +50,6 @@ public class RpcServerChannel extends AbstractRpcChannel implements RpcChannel {
         }
 
         @Override
-        public void disconnect(ChannelPromise promise) {
-            promise.setFailure(new UnsupportedOperationException());
-        }
-
-        @Override
         public void write(Object msg, ChannelPromise promise) {
             promise.setFailure(new UnsupportedOperationException());
         }

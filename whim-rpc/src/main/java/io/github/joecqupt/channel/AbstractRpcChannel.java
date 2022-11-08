@@ -91,20 +91,6 @@ public abstract class AbstractRpcChannel implements RpcChannel {
         return promise;
     }
 
-
-    @Override
-    public ChannelFuture disconnect() {
-        DefaultChannelPromise promise = new DefaultChannelPromise();
-        this.disconnect(promise);
-        return promise;
-    }
-
-    @Override
-    public ChannelFuture disconnect(ChannelPromise promise) {
-        this.close(promise);
-        return promise;
-    }
-
     @Override
     public ChannelFuture close() {
         DefaultChannelPromise promise = new DefaultChannelPromise();

@@ -90,21 +90,6 @@ public class DefaultChannelContext implements ChannelContext {
 
 
     @Override
-    public ChannelFuture disconnect() {
-        DefaultChannelPromise promise = new DefaultChannelPromise();
-        disconnect(promise);
-        return promise;
-    }
-
-    @Override
-    public ChannelFuture disconnect(ChannelPromise promise) {
-        ChannelContext nextCtx = findNextOutboundContext(this);
-        ChannelOutboundHandler handler = (ChannelOutboundHandler) nextCtx.channelHandler();
-        handler.disconnect(nextCtx, promise);
-        return promise;
-    }
-
-    @Override
     public ChannelFuture bind(SocketAddress address) {
         DefaultChannelPromise promise = new DefaultChannelPromise();
         bind(address, promise);

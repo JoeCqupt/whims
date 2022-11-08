@@ -11,8 +11,6 @@ public interface ChannelOutboundHandler extends ChannelHandler {
 
     void connect(ChannelContext context, SocketAddress address, ChannelPromise promise);
 
-    void disconnect(ChannelContext context, ChannelPromise promise);
-
     void bind(ChannelContext context, SocketAddress address, ChannelPromise promise);
 
     void write(ChannelContext context, Object msg, ChannelPromise promise);

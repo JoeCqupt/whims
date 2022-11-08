@@ -4,6 +4,8 @@ import java.util.concurrent.Future;
 
 public interface ChannelFuture<T> extends Future<T> {
 
+    RpcChannel channel();
+
     void addListener(FutureListener listeners);
 
     void addListeners(FutureListener... listeners);
@@ -11,4 +13,6 @@ public interface ChannelFuture<T> extends Future<T> {
     void removeListener(FutureListener listeners);
 
     void removeListeners(FutureListener... listeners);
+
+    ChannelFuture<T> await();
 }

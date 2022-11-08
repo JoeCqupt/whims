@@ -65,11 +65,6 @@ public class RpcClientChannel extends AbstractRpcChannel implements RpcChannel {
         }
 
         @Override
-        public void disconnect(ChannelPromise promise) {
-            close(promise);
-        }
-
-        @Override
         public void write(Object msg, ChannelPromise promise) {
             try {
                 writeBuffer.add((ByteBuffer) msg);

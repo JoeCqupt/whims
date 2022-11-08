@@ -11,10 +11,6 @@ public interface ChannelOutboundInvoker {
 
     ChannelFuture connect(SocketAddress address, ChannelPromise promise);
 
-    ChannelFuture disconnect();
-
-    ChannelFuture disconnect(ChannelPromise promise);
-
     ChannelFuture bind(SocketAddress address);
 
     ChannelFuture bind(SocketAddress address, ChannelPromise promise);

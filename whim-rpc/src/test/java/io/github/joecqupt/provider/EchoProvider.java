@@ -19,7 +19,8 @@ public class EchoProvider {
         registryConfig.setRegisterUrl(endPoint);
         rpcServer.setPort(port);
         rpcServer.setRegisterConfig(registryConfig);
-        rpcServer.eventLoopGroup(new EventLoopGroup(1));
+        rpcServer.workEventLoopGroup(new EventLoopGroup(1));
+        rpcServer.bossEventLoopGroup(new EventLoopGroup(4));
         rpcServer.export(EchoService.class, echoService);
         rpcServer.start();
     }

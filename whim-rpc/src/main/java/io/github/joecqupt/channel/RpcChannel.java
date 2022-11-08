@@ -21,8 +21,6 @@ public interface RpcChannel extends ChannelOutboundInvoker {
 
         void connect(SocketAddress address, ChannelPromise promise);
 
-        void disconnect(ChannelPromise promise);
-
         void close(ChannelPromise promise);
 
         void write(Object msg, ChannelPromise promise);

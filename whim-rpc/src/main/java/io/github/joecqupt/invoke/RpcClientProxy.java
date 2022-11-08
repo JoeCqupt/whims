@@ -44,7 +44,6 @@ public class RpcClientProxy implements InvocationHandler {
             SelectionStrategy random = SelectionStrategyManager.random();
             ServiceInstance instance = random.select(serviceInstanceList);
             RpcChannel channel = ConnectionPool.getChannel(instance);
-            eventLoopGroup.register(channel);
 
             // 构造请求
             RpcRequest rpcRequest = new RpcRequest();
@@ -55,7 +54,8 @@ public class RpcClientProxy implements InvocationHandler {
             rpcMeta.setProtocolType(protocolType);
             rpcRequest.setRpcMeta(rpcMeta);
             rpcRequest.setRequest(req);
-            channel.pipeline().write(rpcRequest);
+            // TODO fixit
+            channel.write(rpcRequest);
             // 获取返回信息
             RpcFuture future = FutureStore.buildFuture(invokeId, method.getReturnType());
             // 同步请求方式

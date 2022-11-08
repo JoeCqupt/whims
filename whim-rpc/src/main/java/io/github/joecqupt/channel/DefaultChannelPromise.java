@@ -6,6 +6,21 @@ import java.util.concurrent.TimeoutException;
 
 // TODO @jiangyuan04
 public class DefaultChannelPromise implements ChannelPromise {
+
+    private RpcChannel channel;
+
+    public DefaultChannelPromise() {
+    }
+
+    public DefaultChannelPromise(RpcChannel channel) {
+        this.channel = channel;
+    }
+
+    @Override
+    public RpcChannel channel() {
+        return null;
+    }
+
     @Override
     public void addListener(FutureListener listeners) {
 
@@ -24,6 +39,11 @@ public class DefaultChannelPromise implements ChannelPromise {
     @Override
     public void removeListeners(FutureListener... listeners) {
 
+    }
+
+    @Override
+    public ChannelFuture await() {
+        return null;
     }
 
     @Override

@@ -29,15 +29,18 @@ public class RpcServer {
         return this;
     }
 
-    public RpcServer export(Class<?> interfaceClass, Object service) {
-        this.interfaceClass = interfaceClass;
-        this.service = service;
-        return this;
+    public void export(Class<?> interfaceClass, Object service) {
+
+        //step1: service local register
+        LocalServiceManager.registerService(interfaceClass, service);
+
+        //step2: service remote register
+        Registry register = RegistryManager.getRegister(config);
+        LocalServiceManager.export(register, port);
     }
 
     public void start() throws Exception {
-        //step1: service local register
-        LocalServiceManager.registerService(interfaceClass, service);
+
 
         //step2: start server
         ServerBootstrap serverBootstrap = new ServerBootstrap();
@@ -63,10 +66,5 @@ public class RpcServer {
         if (!future.isSuccess()) {
             throw new IllegalStateException("start rpc service fail", future.cause());
         }
-
-
-        //step3: service remote register
-        Registry register = RegistryManager.getRegister(config);
-        LocalServiceManager.export(register, port);
     }
 }

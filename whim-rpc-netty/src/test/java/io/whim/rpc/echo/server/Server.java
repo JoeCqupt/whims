@@ -18,7 +18,9 @@ public class Server {
         RpcServer server = new RpcServer();
         server.port(6666)
                 .registerConfig(config)
-                .export(EchoService.class, echoService)
                 .start();
+
+
+        server.export(EchoService.class, echoService);
     }
 }

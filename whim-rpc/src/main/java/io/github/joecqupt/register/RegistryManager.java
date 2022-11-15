@@ -13,12 +13,12 @@ public class RegistryManager {
         if (serviceRegister != null) {
             return serviceRegister;
         }
-        if (RegistryType.END_POINTS == config.getRegisterType()) {
+        if (RegistryType.END_POINTS == config.getRegistryType()) {
             EndPointsRegistry endPointsRegistry = new EndPointsRegistry();
             endPointsRegistry.init(config);
             registerMap.put(config, endPointsRegistry);
             return endPointsRegistry;
         }
-        throw new RuntimeException("unsupported RegisterType. register config:" + config);
+        throw new RuntimeException("Unsupported registryType. register config:" + config);
     }
 }

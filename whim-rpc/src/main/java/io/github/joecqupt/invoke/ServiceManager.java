@@ -5,7 +5,6 @@ import io.github.joecqupt.common.ReflectionUtils;
 import io.github.joecqupt.common.Utils;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,8 +19,11 @@ public class ServiceManager {
     private static final Map<String, ApiMeta> API = new ConcurrentHashMap<>();
 
     public static synchronized List<Method> registerService(Class<?> interfaze, Object service) {
+        if (!interfaze.isInstance(service)) {
+            throw new IllegalArgumentException(service + "not instance of " + interfaze);
+        }
         List<Method> rpcMethods = ReflectionUtils.getMethods(interfaze, RpcMethod.class);
-        for(Method m:rpcMethods){
+        for (Method m : rpcMethods) {
             String apiKey = Utils.apiKey(interfaze.getName(), m.getName());
 
             if (API.containsKey(apiKey)) {
@@ -35,7 +37,7 @@ public class ServiceManager {
                 API.put(apiKey, new ApiMeta(service,
                         service.getClass().getDeclaredMethod(m.getName(), m.getParameterTypes())));
             } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
         return rpcMethods;
@@ -44,7 +46,6 @@ public class ServiceManager {
     public static ApiMeta getApiMeta(String apiKey) {
         return API.get(apiKey);
     }
-
 
 
     public static class ApiMeta {

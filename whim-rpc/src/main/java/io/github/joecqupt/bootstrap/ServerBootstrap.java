@@ -23,7 +23,6 @@ public class ServerBootstrap {
     private EventLoopGroup bossEventLoopGroup;
     private InetSocketAddress socketAddress;
     private List<ChannelHandler> handlers;
-
     private List<ChannelHandler> childHandlers;
 
     private ServerBootstrap() {

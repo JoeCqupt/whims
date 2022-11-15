@@ -46,8 +46,9 @@ public class Bootstrap {
             handlers.forEach(channelHandler ->
                     rpcClientChannel.pipeline().addLast(channelHandler));
         }
-        rpcClientChannel.connect(socketAddress);
         workEventLoopGroup.register(rpcClientChannel);
+        rpcClientChannel.connect(socketAddress);
+
 
         DefaultChannelPromise promise = new DefaultChannelPromise(rpcClientChannel);
         promise.setSuccess(true);

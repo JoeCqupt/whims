@@ -10,31 +10,27 @@ import io.github.joecqupt.register.ProviderInfo;
 import io.github.joecqupt.register.Registry;
 import io.github.joecqupt.register.RegistryConfig;
 import io.github.joecqupt.register.RegistryManager;
+import lombok.Setter;
 
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
+@Setter
 public class RpcServer {
     private RegistryConfig registryConfig;
     private int port;
-    private EventLoopGroup workEventLoopGroup;
-    private EventLoopGroup bossEventLoopGroup;
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public void setRegisterConfig(RegistryConfig registryConfig) {
-        this.registryConfig = registryConfig;
-    }
+    private int bossCount = 1;
+    private int workerCont = 4;
 
     /**
      * export a service interface
      */
     public void export(Class<?> interfaze, Object service) {
+        // local register
         List<Method> rpcMethods = ServiceManager.registerService(interfaze, service);
+        // remote register
         Registry register = RegistryManager.getRegister(registryConfig);
         ProviderInfo providerInfo = new ProviderInfo();
         providerInfo.setRpcMethods(rpcMethods);
@@ -42,26 +38,18 @@ public class RpcServer {
         register.register(providerInfo);
     }
 
-    public void workEventLoopGroup(EventLoopGroup eventLoopGroup) {
-        this.workEventLoopGroup = eventLoopGroup;
-    }
-
-    public void bossEventLoopGroup(EventLoopGroup eventLoopGroup) {
-        this.bossEventLoopGroup = eventLoopGroup;
-    }
-
     /**
      * start the server
      */
     public void start() {
-
         List<ChannelHandler> childHandlers = new ArrayList<>();
         childHandlers.add(new RpcCodecHandler());
         childHandlers.add(new RpcServerHandler());
+
         ServerBootstrap.build()
                 .address(new InetSocketAddress(port))
-                .workEventLoopGroup(workEventLoopGroup)
-                .bossEventLoopGroup(bossEventLoopGroup)
+                .workEventLoopGroup(new EventLoopGroup(bossCount))
+                .bossEventLoopGroup(new EventLoopGroup(workerCont))
                 .childHandler(childHandlers)
                 .bind();
     }

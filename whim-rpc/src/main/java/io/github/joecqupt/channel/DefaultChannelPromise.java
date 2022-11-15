@@ -18,7 +18,7 @@ public class DefaultChannelPromise implements ChannelPromise {
 
     @Override
     public RpcChannel channel() {
-        return null;
+        return channel;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class DefaultChannelPromise implements ChannelPromise {
 
     @Override
     public ChannelFuture await() {
-        return null;
+        return this;
     }
 
     @Override

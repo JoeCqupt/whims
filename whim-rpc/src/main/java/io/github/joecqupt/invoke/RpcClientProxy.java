@@ -4,7 +4,6 @@ import io.github.joecqupt.annotation.RpcMethod;
 import io.github.joecqupt.channel.RpcChannel;
 import io.github.joecqupt.common.Utils;
 import io.github.joecqupt.connection.ConnectionPool;
-import io.github.joecqupt.eventloop.EventLoopGroup;
 import io.github.joecqupt.protocol.ProtocolType;
 import io.github.joecqupt.register.Registry;
 import io.github.joecqupt.register.ServiceInstance;
@@ -20,13 +19,10 @@ public class RpcClientProxy implements InvocationHandler {
 
     private Registry registry;
 
-    private EventLoopGroup eventLoopGroup;
-
     private ProtocolType protocolType;
 
-    public RpcClientProxy(Registry register, EventLoopGroup eventLoopGroup, ProtocolType protocolType) {
+    public RpcClientProxy(Registry register, ProtocolType protocolType) {
         this.registry = register;
-        this.eventLoopGroup = eventLoopGroup;
         this.protocolType = protocolType;
     }
 

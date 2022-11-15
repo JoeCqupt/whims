@@ -12,7 +12,7 @@ public class EventLoopGroup {
     private ThreadLocalRandom random = ThreadLocalRandom.current();
 
     public EventLoopGroup(int size)  {
-        eventLoops = new ArrayList<EventLoop>(size);
+        eventLoops = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             EventLoop eventLoop = new EventLoop();
             eventLoops.add(eventLoop);

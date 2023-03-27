@@ -1,0 +1,4 @@
+rootProject.name = 'gateway1'
+include 'server'
+include 'console'
+

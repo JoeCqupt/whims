@@ -1,23 +1,21 @@
 package io.whim.gateway;
 
 import io.whim.gateway.conf.Confs;
-import io.whim.gateway.handler.FilteringWebHandler;
-import io.whim.gateway.handler.ServerExchange;
+import io.whim.gateway.route.RouteLoader;
 import reactor.netty.DisposableServer;
 import reactor.netty.http.server.HttpServer;
+import reactor.netty.http.server.HttpServerRoutes;
 
 public class ServerMain {
     public static void main(String[] args) {
         Confs.loadConf(args);
 
-        FilteringWebHandler webHandler = new FilteringWebHandler();
+        HttpServerRoutes httpServerRoutes = HttpServerRoutes.newRoutes();
+        RouteLoader.load(httpServerRoutes);
 
         DisposableServer httpServer = HttpServer
                 .create()
-                .handle((request, response) -> {
-                    ServerExchange serverExchange = new ServerExchange(request, response);
-                    return webHandler.handle(serverExchange);
-                })
+                .handle(httpServerRoutes)
                 .bindNow();
 
     }

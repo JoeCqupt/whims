@@ -1,5 +1,6 @@
 package io.whim.gateway.filter;
 
+import io.whim.gateway.annotations.ShareSafe;
 import io.whim.gateway.handler.ServerExchange;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
@@ -11,6 +12,7 @@ import reactor.netty.http.server.HttpServerResponse;
 /**
  * a simple http routing filter
  */
+@ShareSafe
 public class HttpClientRoutingFilter implements WebFilter {
     @Override
     public Publisher<Void> filter(FilterChain filterChain, ServerExchange serverExchange) {

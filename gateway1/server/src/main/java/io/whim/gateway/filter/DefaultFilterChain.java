@@ -15,11 +15,11 @@ public class DefaultFilterChain implements FilterChain {
 
     @Override
     public Publisher<Void> doFilter(ServerExchange serverExchange) {
-        if(idx>=webFilterList.size()){
+        if (idx >= webFilterList.size()) {
             return Mono.empty();
         }
         WebFilter webFilter = webFilterList.get(idx);
         idx++;
-        return webFilter.filter( this, serverExchange);
+        return webFilter.filter(this, serverExchange);
     }
 }

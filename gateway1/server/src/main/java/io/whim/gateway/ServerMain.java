@@ -7,7 +7,7 @@ import reactor.netty.http.server.HttpServer;
 import reactor.netty.http.server.HttpServerRoutes;
 
 public class ServerMain {
-    public static void main(String[] args) {
+    public static void main(String[] args)  {
         Confs.loadConf(args);
 
         HttpServerRoutes httpServerRoutes = HttpServerRoutes.newRoutes();
@@ -16,7 +16,10 @@ public class ServerMain {
         DisposableServer httpServer = HttpServer
                 .create()
                 .handle(httpServerRoutes)
+                .port(8989)
                 .bindNow();
 
+        httpServer.onDispose()
+                .block();
     }
 }

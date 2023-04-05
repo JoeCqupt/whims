@@ -4,14 +4,16 @@ import io.whim.gateway.handler.ServerExchange;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DefaultFilterChain implements FilterChain {
 
-    // TODO: init
-    private List<WebFilter> webFilterList = new ArrayList<>();
+    private List<WebFilter> webFilterList;
     private int idx = 0;
+
+    public DefaultFilterChain(List<WebFilter> webFilterList) {
+        this.webFilterList = webFilterList;
+    }
 
     @Override
     public Publisher<Void> doFilter(ServerExchange serverExchange) {

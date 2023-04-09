@@ -1,8 +1,9 @@
 package io.whim.gateway.handler;
 
-import io.whim.gateway.filter.DefaultFilterChain;
-import io.whim.gateway.filter.FilterChain;
+import io.whim.gateway.filter.DefaultWebFilterChain;
+import io.whim.gateway.filter.WebFilterChain;
 import io.whim.gateway.filter.WebFilter;
+import io.whim.gateway.server.ServerWebExchange;
 import org.reactivestreams.Publisher;
 import reactor.netty.http.server.HttpServerRequest;
 import reactor.netty.http.server.HttpServerResponse;
@@ -19,8 +20,9 @@ public class FilteringWebHandler implements WebHandler {
 
     @Override
     public Publisher<Void> handle(HttpServerRequest request, HttpServerResponse response) {
-        FilterChain filterChain = new DefaultFilterChain(webFilterList);
-        ServerExchange serverExchange = new ServerExchange(request, response);
-        return filterChain.doFilter(serverExchange);
+        WebFilterChain webFilterChain = new DefaultWebFilterChain(webFilterList);
+
+        ServerWebExchange serverWebExchange = new ServerWebExchange(request, response);
+        return webFilterChain.doFilter(serverWebExchange);
     }
 }

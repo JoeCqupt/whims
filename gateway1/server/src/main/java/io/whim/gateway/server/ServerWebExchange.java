@@ -1,13 +1,13 @@
-package io.whim.gateway.handler;
+package io.whim.gateway.server;
 
 import reactor.netty.http.server.HttpServerRequest;
 import reactor.netty.http.server.HttpServerResponse;
 
-public class ServerExchange {
+public class ServerWebExchange {
     private HttpServerRequest request;
     private HttpServerResponse response;
 
-    public ServerExchange(HttpServerRequest request, HttpServerResponse response) {
+    public ServerWebExchange(HttpServerRequest request, HttpServerResponse response) {
         this.request = request;
         this.response = response;
     }

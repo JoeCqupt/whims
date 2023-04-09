@@ -1,10 +1,10 @@
 package io.whim.gateway.route;
 
-import io.whim.gateway.filter.FilterChain;
+import io.whim.gateway.filter.WebFilterChain;
 import io.whim.gateway.filter.HttpClientRoutingFilter;
 import io.whim.gateway.filter.WebFilter;
 import io.whim.gateway.handler.FilteringWebHandler;
-import io.whim.gateway.handler.ServerExchange;
+import io.whim.gateway.server.ServerWebExchange;
 import org.reactivestreams.Publisher;
 import reactor.netty.http.server.HttpServerRoutes;
 
@@ -21,10 +21,10 @@ public class RouteLoader {
         List<WebFilter> webFilterList = new ArrayList<>();
         webFilterList.add(new WebFilter() {
             @Override
-            public Publisher<Void> filter(FilterChain filterChain, ServerExchange serverExchange) {
-                String reUrl = serverExchange.getRequest().param("reUrl");
+            public Publisher<Void> filter(WebFilterChain webFilterChain, ServerWebExchange serverWebExchange) {
+                String reUrl = serverWebExchange.getRequest().param("reUrl");
 
-                return filterChain.doFilter(serverExchange);
+                return webFilterChain.doFilter(serverWebExchange);
             }
         });
         webFilterList.add(new HttpClientRoutingFilter());

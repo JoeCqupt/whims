@@ -4,19 +4,19 @@ import reactor.netty.http.server.HttpServerRequest;
 import reactor.netty.http.server.HttpServerResponse;
 
 public class ServerWebExchange {
-    private HttpServerRequest request;
-    private HttpServerResponse response;
+    private HttpRequest request;
+    private HttpResponse response;
 
     public ServerWebExchange(HttpServerRequest request, HttpServerResponse response) {
-        this.request = request;
-        this.response = response;
+        this.request = new HttpRequest(request);
+        this.response = new HttpResponse(response);
     }
 
-    public HttpServerRequest getRequest() {
+    public HttpRequest getRequest() {
         return request;
     }
 
-    public HttpServerResponse getResponse() {
+    public HttpResponse getResponse() {
         return response;
     }
 }

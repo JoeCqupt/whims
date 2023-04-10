@@ -1,13 +1,13 @@
 package io.whim.gateway.filter;
 
 import io.whim.gateway.annotations.ShareSafe;
+import io.whim.gateway.server.HttpRequest;
+import io.whim.gateway.server.HttpResponse;
 import io.whim.gateway.server.ServerWebExchange;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 import reactor.netty.ByteBufFlux;
 import reactor.netty.http.client.HttpClient;
-import reactor.netty.http.server.HttpServerRequest;
-import reactor.netty.http.server.HttpServerResponse;
 
 /**
  * a simple http routing filter
@@ -16,12 +16,13 @@ import reactor.netty.http.server.HttpServerResponse;
 public class HttpClientRoutingFilter implements WebFilter {
     @Override
     public Publisher<Void> filter(WebFilterChain webFilterChain, ServerWebExchange serverWebExchange) {
-        HttpServerRequest request = serverWebExchange.getRequest();
-        HttpServerResponse response = serverWebExchange.getResponse();
+        HttpRequest request = serverWebExchange.getRequest();
+        HttpResponse response = serverWebExchange.getResponse();
 
+        // FIXME
         ByteBufFlux byteBufFlux = HttpClient.create()
-                .request(request.method())
-                .uri(request.uri())
+                .request(request.getMethod())
+                .uri(request.getUri())
                 .send(Mono.empty())
                 .responseContent();
 

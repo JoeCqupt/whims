@@ -4,6 +4,7 @@ import io.whim.gateway.filter.WebFilterChain;
 import io.whim.gateway.filter.HttpClientRoutingFilter;
 import io.whim.gateway.filter.WebFilter;
 import io.whim.gateway.handler.FilteringWebHandler;
+import io.whim.gateway.server.HttpRequest;
 import io.whim.gateway.server.ServerWebExchange;
 import org.reactivestreams.Publisher;
 import reactor.netty.http.server.HttpServerRoutes;
@@ -22,8 +23,9 @@ public class RouteLoader {
         webFilterList.add(new WebFilter() {
             @Override
             public Publisher<Void> filter(WebFilterChain webFilterChain, ServerWebExchange serverWebExchange) {
-                String reUrl = serverWebExchange.getRequest().param("reUrl");
-
+                HttpRequest request = serverWebExchange.getRequest();
+                String reUrl =request.getQueryParams().get("reUrl");
+                request.setUri(reUrl);
                 return webFilterChain.doFilter(serverWebExchange);
             }
         });
